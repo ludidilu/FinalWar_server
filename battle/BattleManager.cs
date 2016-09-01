@@ -19,33 +19,40 @@ public class BattleManager
 
     private const bool isVsAi = false;
 
-    private Dictionary<PlayerUnit, BattleUnit> battleListWithPlayer = new Dictionary<PlayerUnit, BattleUnit>();
+    private Dictionary<IUnit, BattleUnit> battleListWithPlayer = new Dictionary<IUnit, BattleUnit>();
 
-    private PlayerUnit lastPlayer = null;
+    private IUnit lastPlayer = null;
     
-    public void PlayerEnter(PlayerUnit _playerUnit)
+    public void PlayerEnter(IUnit _playerUnit)
     {
-        if(lastPlayer == null && !isVsAi)
+        if (battleListWithPlayer.ContainsKey(_playerUnit))
         {
-            lastPlayer = _playerUnit;
+            battleListWithPlayer[_playerUnit].RefreshData(_playerUnit);
         }
         else
         {
-            BattleUnit unit = new BattleUnit();
-
-            List<int> mCards = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8 };
-
-            List<int> oCards = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8 };
-
-            unit.Init(_playerUnit, lastPlayer, mCards, oCards, 1, isVsAi);
-
-            battleListWithPlayer.Add(_playerUnit, unit);
-
-            if(lastPlayer != null)
+            if (lastPlayer == null && !isVsAi)
             {
-                battleListWithPlayer.Add(lastPlayer, unit);
+                lastPlayer = _playerUnit;
+            }
+            else
+            {
+                BattleUnit unit = new BattleUnit();
 
-                lastPlayer = null;
+                List<int> mCards = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8 };
+
+                List<int> oCards = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8 };
+
+                unit.Init(_playerUnit, lastPlayer, mCards, oCards, 1, isVsAi);
+
+                battleListWithPlayer.Add(_playerUnit, unit);
+
+                if (lastPlayer != null)
+                {
+                    battleListWithPlayer.Add(lastPlayer, unit);
+
+                    lastPlayer = null;
+                }
             }
         }
     }

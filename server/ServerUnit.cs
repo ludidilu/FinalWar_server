@@ -4,7 +4,11 @@ using System.IO;
 
 public class ServerUnit
 {
+    private const int KICK_TICK_LONG = 100000;
+
     private const int HEAD_LENGTH = 2;
+
+    private const int UID_LENGTH = 4;
 
     private Socket socket;
 
@@ -14,30 +18,95 @@ public class ServerUnit
 
     private byte[] bodyBuffer = new byte[ushort.MaxValue];
 
-    private IUnit unit;
+    internal IUnit unit { get; private set; }
 
     private bool isReceiveHead = true;
 
-    internal void Init(Socket _socket, IUnit _unit)
+    private int lastTick;
+
+    internal void Init(Socket _socket, int _tick)
     {
         socket = _socket;
 
-        unit = _unit;
+        lastTick = _tick;
     }
 
-    internal void Update()
+    internal void SetUnit(IUnit _unit)
     {
-        if (isReceiveHead)
+        unit = _unit;
+
+        unit.Init(SendData);
+    }
+
+    internal void Kick()
+    {
+        Log.Write("One user be kicked");
+
+        if(unit != null)
         {
-            ReceiveHead();
+            unit.Init(null);
+        }
+
+        //socket.Shutdown(SocketShutdown.Both);
+
+        socket.Close();
+    }
+
+    internal int CheckLogin(int _tick)
+    {
+        if (_tick - lastTick > KICK_TICK_LONG)
+        {
+            Kick();
+
+            return -1;
+        }
+        else if (socket.Available >= UID_LENGTH)
+        {
+            byte[] bytes = new byte[UID_LENGTH];
+
+            socket.Receive(bytes, UID_LENGTH, SocketFlags.None);
+
+            int uid = BitConverter.ToInt32(bytes, 0);
+
+            if(uid < 1)
+            {
+                Kick();
+
+                return -1;
+            }
+            else
+            {
+                return uid;
+            }
         }
         else
         {
-            ReceiveBody();
+            return 0;
         }
+    } 
+
+    internal bool Update(int _tick)
+    {
+        if(_tick - lastTick > KICK_TICK_LONG)
+        {
+            Kick();
+
+            return true;
+        }
+
+        if (isReceiveHead)
+        {
+            ReceiveHead(_tick);
+        }
+        else
+        {
+            ReceiveBody(_tick);
+        }
+
+        return false;
     }
 
-    private void ReceiveHead()
+    private void ReceiveHead(int _tick)
     {
         if (socket.Available >= HEAD_LENGTH)
         {
@@ -47,14 +116,16 @@ public class ServerUnit
 
             bodyLength = BitConverter.ToUInt16(headBuffer, 0);
 
-            ReceiveBody();
+            ReceiveBody(_tick);
         }
     }
 
-    private void ReceiveBody()
+    private void ReceiveBody(int _tick)
     {
         if (socket.Available >= bodyLength)
         {
+            lastTick = _tick;
+
             socket.Receive(bodyBuffer, bodyLength, SocketFlags.None);
 
             isReceiveHead = true;
@@ -65,7 +136,7 @@ public class ServerUnit
 
             unit.ReceiveData(resultBytes);
 
-            ReceiveHead();
+            ReceiveHead(_tick);
         }
     }
 

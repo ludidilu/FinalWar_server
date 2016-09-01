@@ -3,7 +3,7 @@ using System.IO;
 
 public interface IUnit
 {
-    void ReceiveData(byte[] _bytes);
     void Init(Action<MemoryStream> _sendDataCallBack);
+    void ReceiveData(byte[] _bytes);
     void SendData(MemoryStream _ms);
 }

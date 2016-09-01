@@ -9,7 +9,10 @@ public class PlayerUnit : IUnit
     {
         sendDataCallBack = _sendDataCallBack;
 
-        BattleManager.Instance.PlayerEnter(this);
+        if(sendDataCallBack != null)
+        {
+            BattleManager.Instance.PlayerEnter(this);
+        }
     }
 
     public void ReceiveData(byte[] _bytes)
@@ -19,7 +22,10 @@ public class PlayerUnit : IUnit
 
     public void SendData(MemoryStream _ms)
     {
-        sendDataCallBack(_ms);
+        if(sendDataCallBack != null)
+        {
+            sendDataCallBack(_ms);
+        }
     }
 }
 

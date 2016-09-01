@@ -4,12 +4,12 @@ using System.Collections.Generic;
 
 public class BattleUnit
 {
-    private PlayerUnit mPlayer;
-    private PlayerUnit oPlayer;
+    private IUnit mPlayer;
+    private IUnit oPlayer;
 
     private Battle battle;
 
-    public void Init(PlayerUnit _mPlayer,PlayerUnit _oPlayer,List<int> _mCards,List<int> _oCards,int _mapID,bool _isVsAi)
+    internal void Init(IUnit _mPlayer, IUnit _oPlayer,List<int> _mCards,List<int> _oCards,int _mapID,bool _isVsAi)
     {
         mPlayer = _mPlayer;
         oPlayer = _oPlayer;
@@ -20,8 +20,13 @@ public class BattleUnit
 
         battle.ServerStart(_mapID, _mCards, _oCards);
     }
+
+    internal void RefreshData(IUnit _player)
+    {
+        battle.ServerRefreshData(_player == mPlayer);
+    }
     
-    public void ReceiveData(PlayerUnit _playerUnit,byte[] _bytes)
+    internal void ReceiveData(PlayerUnit _playerUnit,byte[] _bytes)
     {
         battle.ServerGetPackage(_bytes, _playerUnit == mPlayer);
     }

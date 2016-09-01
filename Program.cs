@@ -36,6 +36,7 @@ namespace FinalWar_server
             {
                 newHeroDic.Add(pair.Key, pair.Value);
             }
+
             Battle.Init(newHeroDic, Map.mapDataDic);
 
             Server<PlayerUnit> server = new Server<PlayerUnit>();
