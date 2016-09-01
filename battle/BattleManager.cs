@@ -29,6 +29,10 @@ public class BattleManager
         {
             battleListWithPlayer[_playerUnit].RefreshData(_playerUnit);
         }
+        else if(_playerUnit == lastPlayer)
+        {
+
+        }
         else
         {
             if (lastPlayer == null && !isVsAi)
