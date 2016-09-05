@@ -8,11 +8,11 @@ public class Server<T> where T : IUnit, new()
 {
     private Socket socket;
 
-    private List<ServerUnit> noLoginList = new List<ServerUnit>();
+    private List<ServerUnit<T>> noLoginList = new List<ServerUnit<T>>();
 
-    private Dictionary<int, ServerUnit> loginDic = new Dictionary<int, ServerUnit>();
+    private Dictionary<int, ServerUnit<T>> loginDic = new Dictionary<int, ServerUnit<T>>();
 
-    private Dictionary<int, IUnit> logoutDic = new Dictionary<int, IUnit>();
+    private Dictionary<int, T> logoutDic = new Dictionary<int, T>();
 
     private int tick = 0;
 
@@ -38,7 +38,7 @@ public class Server<T> where T : IUnit, new()
 
         Console.WriteLine("One user connect");
 
-        ServerUnit serverUnit = new ServerUnit();
+        ServerUnit<T> serverUnit = new ServerUnit<T>();
 
         lock (noLoginList)
         {
@@ -58,7 +58,7 @@ public class Server<T> where T : IUnit, new()
 
             for (int i = noLoginList.Count - 1; i > -1; i--)
             {
-                ServerUnit serverUnit = noLoginList[i];
+                ServerUnit<T> serverUnit = noLoginList[i];
 
                 int uid = serverUnit.CheckLogin(tick);
 
@@ -66,7 +66,7 @@ public class Server<T> where T : IUnit, new()
                 {
                     noLoginList.RemoveAt(i);
                 }
-                else if (uid != 0)
+                else if (uid > 0)
                 {
                     Console.WriteLine("One user login   uid:" + uid);
 
@@ -74,7 +74,7 @@ public class Server<T> where T : IUnit, new()
 
                     if (loginDic.ContainsKey(uid))
                     {
-                        ServerUnit oldServerUnit = loginDic[uid];
+                        ServerUnit<T> oldServerUnit = loginDic[uid];
 
                         oldServerUnit.Kick();
 
@@ -84,7 +84,7 @@ public class Server<T> where T : IUnit, new()
                     }
                     else if (logoutDic.ContainsKey(uid))
                     {
-                        IUnit unit = logoutDic[uid];
+                        T unit = logoutDic[uid];
 
                         logoutDic.Remove(uid);
 
@@ -104,9 +104,9 @@ public class Server<T> where T : IUnit, new()
             }
         }
 
-        List<KeyValuePair<int, ServerUnit>> kickList = null;
+        List<KeyValuePair<int, ServerUnit<T>>> kickList = null;
 
-        Dictionary<int, ServerUnit>.Enumerator enumerator = loginDic.GetEnumerator();
+        Dictionary<int, ServerUnit<T>>.Enumerator enumerator = loginDic.GetEnumerator();
 
         while (enumerator.MoveNext())
         {
@@ -116,7 +116,7 @@ public class Server<T> where T : IUnit, new()
             {
                 if(kickList == null)
                 {
-                    kickList = new List<KeyValuePair<int, ServerUnit>>();
+                    kickList = new List<KeyValuePair<int, ServerUnit<T>>>();
                 }
 
                 kickList.Add(enumerator.Current);
@@ -127,7 +127,7 @@ public class Server<T> where T : IUnit, new()
         {
             for(int i = 0; i < kickList.Count; i++)
             {
-                KeyValuePair<int, ServerUnit> pair = kickList[i];
+                KeyValuePair<int, ServerUnit<T>> pair = kickList[i];
 
                 loginDic.Remove(pair.Key);
 

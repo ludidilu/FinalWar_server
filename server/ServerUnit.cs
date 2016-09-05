@@ -2,9 +2,9 @@
 using System.Net.Sockets;
 using System.IO;
 
-public class ServerUnit
+public class ServerUnit<T> where T : IUnit, new()
 {
-    private const int KICK_TICK_LONG = 10000;
+    private const int KICK_TICK_LONG = 100000;
 
     private const int HEAD_LENGTH = 2;
 
@@ -18,7 +18,7 @@ public class ServerUnit
 
     private byte[] bodyBuffer = new byte[ushort.MaxValue];
 
-    internal IUnit unit { get; private set; }
+    internal T unit { get; private set; }
 
     private bool isReceiveHead = true;
 
@@ -31,7 +31,7 @@ public class ServerUnit
         lastTick = _tick;
     }
 
-    internal void SetUnit(IUnit _unit)
+    internal void SetUnit(T _unit)
     {
         unit = _unit;
 
