@@ -12,6 +12,8 @@ public class Server<T> where T : IUnit, new()
 
     private Dictionary<int, ServerUnit> loginDic = new Dictionary<int, ServerUnit>();
 
+    private Dictionary<int, IUnit> logoutDic = new Dictionary<int, IUnit>();
+
     private int tick = 0;
 
     public void Start(string _path, int _port, int _maxConnections)
@@ -80,6 +82,16 @@ public class Server<T> where T : IUnit, new()
 
                         loginDic[uid] = serverUnit;
                     }
+                    else if (logoutDic.ContainsKey(uid))
+                    {
+                        IUnit unit = logoutDic[uid];
+
+                        logoutDic.Remove(uid);
+
+                        serverUnit.SetUnit(unit);
+
+                        loginDic.Add(uid, serverUnit);
+                    }
                     else
                     {
                         T unit = new T();
@@ -92,7 +104,7 @@ public class Server<T> where T : IUnit, new()
             }
         }
 
-        List<int> kickList = null;
+        List<KeyValuePair<int, ServerUnit>> kickList = null;
 
         Dictionary<int, ServerUnit>.Enumerator enumerator = loginDic.GetEnumerator();
 
@@ -104,10 +116,10 @@ public class Server<T> where T : IUnit, new()
             {
                 if(kickList == null)
                 {
-                    kickList = new List<int>();
+                    kickList = new List<KeyValuePair<int, ServerUnit>>();
                 }
 
-                kickList.Add(enumerator.Current.Key);
+                kickList.Add(enumerator.Current);
             }
         }
 
@@ -115,7 +127,11 @@ public class Server<T> where T : IUnit, new()
         {
             for(int i = 0; i < kickList.Count; i++)
             {
-                loginDic.Remove(kickList[i]);
+                KeyValuePair<int, ServerUnit> pair = kickList[i];
+
+                loginDic.Remove(pair.Key);
+
+                logoutDic.Add(pair.Key, pair.Value.unit);
             }
         }
     }

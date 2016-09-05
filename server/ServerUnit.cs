@@ -4,7 +4,7 @@ using System.IO;
 
 public class ServerUnit
 {
-    private const int KICK_TICK_LONG = 100000;
+    private const int KICK_TICK_LONG = 10000;
 
     private const int HEAD_LENGTH = 2;
 
