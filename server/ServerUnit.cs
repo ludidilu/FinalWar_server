@@ -16,8 +16,6 @@ public class ServerUnit<T> where T : IUnit, new()
 
     private byte[] headBuffer = new byte[HEAD_LENGTH];
 
-    private byte[] bodyBuffer = new byte[ushort.MaxValue];
-
     internal T unit { get; private set; }
 
     private bool isReceiveHead = true;
@@ -126,15 +124,13 @@ public class ServerUnit<T> where T : IUnit, new()
         {
             lastTick = _tick;
 
+            byte[] bodyBuffer = new byte[bodyLength];
+
             socket.Receive(bodyBuffer, bodyLength, SocketFlags.None);
 
             isReceiveHead = true;
-           
-            byte[] resultBytes = new byte[bodyLength];
 
-            Array.Copy(bodyBuffer, 0, resultBytes, 0, bodyLength);
-
-            unit.ReceiveData(resultBytes);
+            unit.ReceiveData(bodyBuffer);
 
             ReceiveHead(_tick);
         }
