@@ -4,7 +4,7 @@
     public int skillTarget;
     public int targetNum;
     public int skillEffect;
-    public int[] skillDatas;
+    public float[] skillDatas;
 
     public SkillTime GetSkillTime()
     {
@@ -22,7 +22,7 @@
     {
         return (SkillEffect)skillEffect;
     }
-    public int[] GetSkillDatas()
+    public float[] GetSkillDatas()
     {
         return skillDatas;
     }
