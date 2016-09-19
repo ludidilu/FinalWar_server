@@ -32,12 +32,21 @@ namespace FinalWar_server
 
             Dictionary<int, IHeroSDS> newHeroDic = new Dictionary<int, IHeroSDS>();
 
-            foreach(KeyValuePair<int,HeroSDS> pair in heroDic)
+            foreach(KeyValuePair<int, HeroSDS> pair in heroDic)
             {
                 newHeroDic.Add(pair.Key, pair.Value);
             }
 
-            Battle.Init(newHeroDic, Map.mapDataDic);
+            Dictionary<int, SkillSDS> skillDic = StaticData.GetDic<SkillSDS>();
+
+            Dictionary<int, ISkillSDS> newSkillDic = new Dictionary<int, ISkillSDS>();
+
+            foreach(KeyValuePair<int, SkillSDS> pair in skillDic)
+            {
+                newSkillDic.Add(pair.Key, pair.Value);
+            }
+
+            Battle.Init(Map.mapDataDic, newHeroDic, newSkillDic);
 
             Server<PlayerUnit> server = new Server<PlayerUnit>();
 
