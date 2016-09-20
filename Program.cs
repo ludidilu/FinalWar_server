@@ -37,6 +37,8 @@ namespace FinalWar_server
                 newHeroDic.Add(pair.Key, pair.Value);
             }
 
+            StaticData.Load<SkillSDS>("skill");
+
             Dictionary<int, SkillSDS> skillDic = StaticData.GetDic<SkillSDS>();
 
             Dictionary<int, ISkillSDS> newSkillDic = new Dictionary<int, ISkillSDS>();
