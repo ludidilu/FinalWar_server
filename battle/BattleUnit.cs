@@ -18,7 +18,7 @@ public class BattleUnit
 
         battle.ServerSetCallBack(SendData);
 
-        battle.ServerStart(_mapID, _mCards, _oCards);
+        battle.ServerStart(_mapID, _mCards, _oCards, _isVsAi);
     }
 
     internal void RefreshData(IUnit _player)
