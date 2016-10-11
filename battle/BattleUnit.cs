@@ -40,7 +40,7 @@ internal class BattleUnit
         {
             using(BinaryWriter bw = new BinaryWriter(ms))
             {
-                bw.Write((short)1);
+                bw.Write((short)0);
 
                 short length = (short)_ms.Length;
 

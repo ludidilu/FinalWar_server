@@ -40,17 +40,11 @@ internal class BattleManager
         {
             if (_playerUnit == lastPlayer)
             {
-                lastPlayer = null;
+                ReplyClient(_playerUnit, 1);
             }
-
-            using(MemoryStream ms = new MemoryStream())
+            else
             {
-                using(BinaryWriter bw = new BinaryWriter(ms))
-                {
-                    bw.Write((short)0);
-
-                    _playerUnit.SendData(ms);
-                }
+                ReplyClient(_playerUnit, 2);
             }
         }
     }
@@ -84,6 +78,8 @@ internal class BattleManager
                         if (lastPlayer == null)
                         {
                             lastPlayer = _playerUnit;
+
+                            ReplyClient(_playerUnit, 1);
                         }
                         else
                         {
@@ -126,10 +122,34 @@ internal class BattleManager
 
                         battleList.Add(battleUnit, new List<IUnit>() { _playerUnit });
 
-                        battleUnit.Init(_playerUnit, null, mCards, oCards, 1, false);
+                        battleUnit.Init(_playerUnit, null, mCards, oCards, 1, true);
+
+                        break;
+
+                    case 2:
+
+                        if(lastPlayer == _playerUnit)
+                        {
+                            lastPlayer = null;
+
+                            ReplyClient(_playerUnit, 2);
+                        }
 
                         break;
                 }
+            }
+        }
+    }
+
+    private void ReplyClient(IUnit _playerUnit, short _type)
+    {
+        using (MemoryStream ms = new MemoryStream())
+        {
+            using (BinaryWriter bw = new BinaryWriter(ms))
+            {
+                bw.Write(_type);
+
+                _playerUnit.SendData(ms);
             }
         }
     }
