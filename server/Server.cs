@@ -4,7 +4,7 @@ using System.Net;
 using System.Collections.Generic;
 
 
-public class Server<T> where T : IUnit, new()
+internal class Server<T> where T : IUnit, new()
 {
     private Socket socket;
 
@@ -16,7 +16,7 @@ public class Server<T> where T : IUnit, new()
 
     private int tick = 0;
 
-    public void Start(string _path, int _port, int _maxConnections)
+    internal void Start(string _path, int _port, int _maxConnections)
     {
         socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 

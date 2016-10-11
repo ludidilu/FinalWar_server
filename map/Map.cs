@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Collections.Generic;
 
 public class Map
@@ -12,13 +11,17 @@ public class Map
 
         Dictionary<int, MapSDS> mapDic = StaticData.GetDic<MapSDS>();
 
-        foreach (MapSDS mapSDS in mapDic.Values)
+        Dictionary<int, MapSDS>.Enumerator enumerator = mapDic.GetEnumerator();
+
+        while (enumerator.MoveNext())
         {
+            KeyValuePair<int, MapSDS> pair = enumerator.Current;
+
             MapData mapData = new MapData();
 
-            mapDataDic.Add(mapSDS.ID, mapData);
+            mapDataDic.Add(pair.Key, mapData);
 
-            using (FileStream fs = new FileStream(ConfigDictionary.Instance.map_path + mapSDS.name, FileMode.Open))
+            using (FileStream fs = new FileStream(ConfigDictionary.Instance.map_path + pair.Value.name, FileMode.Open))
             {
                 using (BinaryReader br = new BinaryReader(fs))
                 {

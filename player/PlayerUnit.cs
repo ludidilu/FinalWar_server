@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-public class PlayerUnit : IUnit
+internal class PlayerUnit : IUnit
 {
     private Action<MemoryStream> sendDataCallBack;
 

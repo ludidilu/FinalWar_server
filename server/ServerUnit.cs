@@ -2,7 +2,7 @@
 using System.Net.Sockets;
 using System.IO;
 
-public class ServerUnit<T> where T : IUnit, new()
+internal class ServerUnit<T> where T : IUnit, new()
 {
     private const int KICK_TICK_LONG = 100000;
 
@@ -136,7 +136,7 @@ public class ServerUnit<T> where T : IUnit, new()
         }
     }
 
-    public void SendData(MemoryStream _ms)
+    internal void SendData(MemoryStream _ms)
     {
         int length = HEAD_LENGTH + (int)_ms.Length;
 
