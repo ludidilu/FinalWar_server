@@ -20,9 +20,9 @@ internal class BattleManager
 
     private Queue<BattleUnit> battleUnitPool = new Queue<BattleUnit>();
 
-    private List<int> mCards = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8 };
+    private List<int> mCards = new List<int>() { 1, 2, 3, 4, 5, 1, 2, 3, 4, 5 };
 
-    private List<int> oCards = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8 };
+    private List<int> oCards = new List<int>() { 1, 2, 3, 4, 5, 1, 2, 3, 4, 5 };
 
     private Dictionary<BattleUnit, List<IUnit>> battleList = new Dictionary<BattleUnit, List<IUnit>>();
 
