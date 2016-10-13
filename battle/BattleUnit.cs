@@ -16,12 +16,12 @@ internal class BattleUnit
         battle.ServerSetCallBack(SendData, BattleOver);
     }
 
-    internal void Init(IUnit _mPlayer, IUnit _oPlayer,List<int> _mCards,List<int> _oCards,int _mapID,bool _isVsAi)
+    internal void Init(IUnit _mPlayer, IUnit _oPlayer, List<int> _mCards, List<int> _oCards, int _mapID, bool _isVsAi, float _mFix, float _oFix)
     {
         mPlayer = _mPlayer;
         oPlayer = _oPlayer;
 
-        battle.ServerStart(_mapID, _mCards, _oCards, _isVsAi);
+        battle.ServerStart(_mapID, _mCards, _oCards, _isVsAi, _mFix, _oFix);
     }
 
     internal void RefreshData(IUnit _player)

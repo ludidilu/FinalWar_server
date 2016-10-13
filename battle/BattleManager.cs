@@ -20,9 +20,11 @@ internal class BattleManager
 
     private Queue<BattleUnit> battleUnitPool = new Queue<BattleUnit>();
 
-    private List<int> mCards = new List<int>() { 1, 2, 3, 4, 5, 1, 2, 3, 4, 5 };
+    private List<int> mCards = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
-    private List<int> oCards = new List<int>() { 1, 2, 3, 4, 5, 1, 2, 3, 4, 5 };
+    private List<int> oCards = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+    private const float aiFix = 1.3f;
 
     private Dictionary<BattleUnit, List<IUnit>> battleList = new Dictionary<BattleUnit, List<IUnit>>();
 
@@ -102,7 +104,7 @@ internal class BattleManager
 
                             battleList.Add(battleUnit, new List<IUnit>() { _playerUnit, tmpPlayer });
 
-                            battleUnit.Init(_playerUnit, tmpPlayer, mCards, oCards, 1, false);
+                            battleUnit.Init(_playerUnit, tmpPlayer, mCards, oCards, 1, false, 1, 1);
                         }
 
                         break;
@@ -122,7 +124,7 @@ internal class BattleManager
 
                         battleList.Add(battleUnit, new List<IUnit>() { _playerUnit });
 
-                        battleUnit.Init(_playerUnit, null, mCards, oCards, 1, true);
+                        battleUnit.Init(_playerUnit, null, mCards, oCards, 1, true, 1, aiFix);
 
                         break;
 
