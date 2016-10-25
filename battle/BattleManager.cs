@@ -53,93 +53,119 @@ internal class BattleManager
 
     internal void ReceiveData(IUnit _playerUnit,byte[] _bytes)
     {
-        if (battleListWithPlayer.ContainsKey(_playerUnit))
-        {
-            battleListWithPlayer[_playerUnit].ReceiveData(_playerUnit, _bytes);
-        }
-        else
-        {
-            ReceiveActionData(_playerUnit, _bytes);
-        }
-    }
-
-    private void ReceiveActionData(IUnit _playerUnit, byte[] _bytes)
-    {
         using (MemoryStream ms = new MemoryStream(_bytes))
         {
             using (BinaryReader br = new BinaryReader(ms))
             {
-                BattleUnit battleUnit;
-
-                int type = br.ReadInt16();
+                short type = br.ReadInt16();
 
                 switch (type)
                 {
                     case 0:
 
-                        if (lastPlayer == null)
+                        if (battleListWithPlayer.ContainsKey(_playerUnit))
                         {
-                            lastPlayer = _playerUnit;
+                            short length = br.ReadInt16();
 
-                            ReplyClient(_playerUnit, 1);
+                            byte[] bytes = br.ReadBytes(length);
+
+                            battleListWithPlayer[_playerUnit].ReceiveData(_playerUnit, bytes);
                         }
                         else
                         {
-                            if (battleUnitPool.Count > 0)
+                            if (_playerUnit == lastPlayer)
                             {
-                                battleUnit = battleUnitPool.Dequeue();
+                                ReplyClient(_playerUnit, 1);
                             }
                             else
                             {
-                                battleUnit = new BattleUnit();
+                                ReplyClient(_playerUnit, 2);
                             }
-
-                            IUnit tmpPlayer = lastPlayer;
-
-                            lastPlayer = null;
-
-                            battleListWithPlayer.Add(_playerUnit, battleUnit);
-
-                            battleListWithPlayer.Add(tmpPlayer, battleUnit);
-
-                            battleList.Add(battleUnit, new List<IUnit>() { _playerUnit, tmpPlayer });
-
-                            battleUnit.Init(_playerUnit, tmpPlayer, mCards, oCards, 1, false, 1, 1);
                         }
 
                         break;
 
                     case 1:
 
-                        if (battleUnitPool.Count > 0)
-                        {
-                            battleUnit = battleUnitPool.Dequeue();
-                        }
-                        else
-                        {
-                            battleUnit = new BattleUnit();
-                        }
+                        short actionType = br.ReadInt16();
 
-                        battleListWithPlayer.Add(_playerUnit, battleUnit);
-
-                        battleList.Add(battleUnit, new List<IUnit>() { _playerUnit });
-
-                        battleUnit.Init(_playerUnit, null, mCards, oCards, 1, true, 1, aiFix);
-
-                        break;
-
-                    case 2:
-
-                        if(lastPlayer == _playerUnit)
-                        {
-                            lastPlayer = null;
-
-                            ReplyClient(_playerUnit, 2);
-                        }
+                        ReceiveActionData(_playerUnit, actionType);
 
                         break;
                 }
             }
+        }
+    }
+
+    private void ReceiveActionData(IUnit _playerUnit, short _type)
+    {
+        BattleUnit battleUnit;
+
+        switch (_type)
+        {
+            case 0:
+
+                if (lastPlayer == null)
+                {
+                    lastPlayer = _playerUnit;
+
+                    ReplyClient(_playerUnit, 1);
+                }
+                else
+                {
+                    if (battleUnitPool.Count > 0)
+                    {
+                        battleUnit = battleUnitPool.Dequeue();
+                    }
+                    else
+                    {
+                        battleUnit = new BattleUnit();
+                    }
+
+                    IUnit tmpPlayer = lastPlayer;
+
+                    lastPlayer = null;
+
+                    battleListWithPlayer.Add(_playerUnit, battleUnit);
+
+                    battleListWithPlayer.Add(tmpPlayer, battleUnit);
+
+                    battleList.Add(battleUnit, new List<IUnit>() { _playerUnit, tmpPlayer });
+
+                    battleUnit.Init(_playerUnit, tmpPlayer, mCards, oCards, 1, false, 1, 1);
+                }
+
+                break;
+
+            case 1:
+
+                if (battleUnitPool.Count > 0)
+                {
+                    battleUnit = battleUnitPool.Dequeue();
+                }
+                else
+                {
+                    battleUnit = new BattleUnit();
+                }
+
+                battleListWithPlayer.Add(_playerUnit, battleUnit);
+
+                battleList.Add(battleUnit, new List<IUnit>() { _playerUnit });
+
+                battleUnit.Init(_playerUnit, null, mCards, oCards, 1, true, 1, aiFix);
+
+                break;
+
+            case 2:
+
+                if(lastPlayer == _playerUnit)
+                {
+                    lastPlayer = null;
+
+                    ReplyClient(_playerUnit, 2);
+                }
+
+                break;
         }
     }
 
