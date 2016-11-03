@@ -24,8 +24,6 @@ internal class BattleManager
 
     private List<int> oCards = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
-    private const float aiFix = 1.3f;
-
     private Dictionary<BattleUnit, List<IUnit>> battleList = new Dictionary<BattleUnit, List<IUnit>>();
 
     private Dictionary<IUnit, BattleUnit> battleListWithPlayer = new Dictionary<IUnit, BattleUnit>();
@@ -132,7 +130,7 @@ internal class BattleManager
 
                     battleList.Add(battleUnit, new List<IUnit>() { _playerUnit, tmpPlayer });
 
-                    battleUnit.Init(_playerUnit, tmpPlayer, mCards, oCards, 1, false, 1, 1);
+                    battleUnit.Init(_playerUnit, tmpPlayer, mCards, oCards, 1, false);
                 }
 
                 break;
@@ -152,7 +150,7 @@ internal class BattleManager
 
                 battleList.Add(battleUnit, new List<IUnit>() { _playerUnit });
 
-                battleUnit.Init(_playerUnit, null, mCards, oCards, 1, true, 1, aiFix);
+                battleUnit.Init(_playerUnit, null, mCards, oCards, 1, true);
 
                 break;
 
