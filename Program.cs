@@ -26,6 +26,8 @@ namespace FinalWar_server
 
             Map.Init();
 
+            StaticData.Load<TestCardsSDS>("testCards");
+
             StaticData.Load<HeroSDS>("hero");
 
             Dictionary<int, HeroSDS> heroDic = StaticData.GetDic<HeroSDS>();

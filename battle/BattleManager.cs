@@ -20,10 +20,6 @@ internal class BattleManager
 
     private Queue<BattleUnit> battleUnitPool = new Queue<BattleUnit>();
 
-    private List<int> mCards = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-
-    private List<int> oCards = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-
     private Dictionary<BattleUnit, List<IUnit>> battleList = new Dictionary<BattleUnit, List<IUnit>>();
 
     private Dictionary<IUnit, BattleUnit> battleListWithPlayer = new Dictionary<IUnit, BattleUnit>();
@@ -99,6 +95,10 @@ internal class BattleManager
     {
         BattleUnit battleUnit;
 
+        List<int> mCards;
+
+        List<int> oCards;
+
         switch (_type)
         {
             case 0:
@@ -130,6 +130,10 @@ internal class BattleManager
 
                     battleList.Add(battleUnit, new List<IUnit>() { _playerUnit, tmpPlayer });
 
+                    mCards = new List<int>(StaticData.GetData<TestCardsSDS>(1).cards);
+
+                    oCards = new List<int>(StaticData.GetData<TestCardsSDS>(2).cards);
+
                     battleUnit.Init(_playerUnit, tmpPlayer, mCards, oCards, 1, false);
                 }
 
@@ -149,6 +153,10 @@ internal class BattleManager
                 battleListWithPlayer.Add(_playerUnit, battleUnit);
 
                 battleList.Add(battleUnit, new List<IUnit>() { _playerUnit });
+
+                mCards = new List<int>(StaticData.GetData<TestCardsSDS>(1).cards);
+
+                oCards = new List<int>(StaticData.GetData<TestCardsSDS>(2).cards);
 
                 battleUnit.Init(_playerUnit, null, mCards, oCards, 1, true);
 
