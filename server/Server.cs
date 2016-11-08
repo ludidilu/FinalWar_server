@@ -114,7 +114,7 @@ internal class Server<T> where T : IUnit, new()
 
             if (kick)
             {
-                if(kickList == null)
+                if (kickList == null)
                 {
                     kickList = new List<KeyValuePair<int, ServerUnit<T>>>();
                 }
@@ -123,9 +123,9 @@ internal class Server<T> where T : IUnit, new()
             }
         }
 
-        if(kickList != null)
+        if (kickList != null)
         {
-            for(int i = 0; i < kickList.Count; i++)
+            for (int i = 0; i < kickList.Count; i++)
             {
                 KeyValuePair<int, ServerUnit<T>> pair = kickList[i];
 

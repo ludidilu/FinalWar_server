@@ -9,7 +9,7 @@ internal class BattleManager
     {
         get
         {
-            if(_Instance == null)
+            if (_Instance == null)
             {
                 _Instance = new BattleManager();
             }
@@ -25,7 +25,7 @@ internal class BattleManager
     private Dictionary<IUnit, BattleUnit> battleListWithPlayer = new Dictionary<IUnit, BattleUnit>();
 
     private IUnit lastPlayer = null;
-    
+
     internal void PlayerEnter(IUnit _playerUnit)
     {
         if (battleListWithPlayer.ContainsKey(_playerUnit))
@@ -45,7 +45,7 @@ internal class BattleManager
         }
     }
 
-    internal void ReceiveData(IUnit _playerUnit,byte[] _bytes)
+    internal void ReceiveData(IUnit _playerUnit, byte[] _bytes)
     {
         using (MemoryStream ms = new MemoryStream(_bytes))
         {
@@ -164,7 +164,7 @@ internal class BattleManager
 
             case 2:
 
-                if(lastPlayer == _playerUnit)
+                if (lastPlayer == _playerUnit)
                 {
                     lastPlayer = null;
 
@@ -192,7 +192,7 @@ internal class BattleManager
     {
         List<IUnit> tmpList = battleList[_battleUnit];
 
-        for(int i = 0; i < tmpList.Count; i++)
+        for (int i = 0; i < tmpList.Count; i++)
         {
             battleListWithPlayer.Remove(tmpList[i]);
         }

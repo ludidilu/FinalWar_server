@@ -9,7 +9,7 @@ internal class PlayerUnit : IUnit
     {
         sendDataCallBack = _sendDataCallBack;
 
-        if(sendDataCallBack != null)
+        if (sendDataCallBack != null)
         {
             BattleManager.Instance.PlayerEnter(this);
         }
@@ -22,7 +22,7 @@ internal class PlayerUnit : IUnit
 
     public void SendData(MemoryStream _ms)
     {
-        if(sendDataCallBack != null)
+        if (sendDataCallBack != null)
         {
             sendDataCallBack(_ms);
         }

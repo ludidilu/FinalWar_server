@@ -1,8 +1,10 @@
-﻿public class CsvBase{
+﻿public class CsvBase
+{
 
-	public int ID;
+    public int ID;
 
-	public virtual void Fix(){
+    public virtual void Fix()
+    {
 
-	}
+    }
 }

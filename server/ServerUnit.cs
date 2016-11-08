@@ -40,7 +40,7 @@ internal class ServerUnit<T> where T : IUnit, new()
     {
         Log.Write("One user be kicked");
 
-        if(unit != null)
+        if (unit != null)
         {
             unit.Init(null);
         }
@@ -66,7 +66,7 @@ internal class ServerUnit<T> where T : IUnit, new()
 
             int uid = BitConverter.ToInt32(bytes, 0);
 
-            if(uid < 1)
+            if (uid < 1)
             {
                 Kick();
 
@@ -81,11 +81,11 @@ internal class ServerUnit<T> where T : IUnit, new()
         {
             return 0;
         }
-    } 
+    }
 
     internal bool Update(int _tick)
     {
-        if(_tick - lastTick > KICK_TICK_LONG)
+        if (_tick - lastTick > KICK_TICK_LONG)
         {
             Kick();
 
@@ -148,7 +148,7 @@ internal class ServerUnit<T> where T : IUnit, new()
 
         socket.BeginSend(bytes, 0, length, SocketFlags.None, SendCallBack, null);
     }
-    
+
     private void SendCallBack(IAsyncResult _result)
     {
         socket.EndSend(_result);

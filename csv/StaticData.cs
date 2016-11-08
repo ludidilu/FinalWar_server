@@ -10,9 +10,9 @@ public class StaticData
 
     public const string datName = "csv.dat";
 
-	public static Dictionary<Type, IDictionary> dic = new Dictionary<Type, IDictionary>();
+    public static Dictionary<Type, IDictionary> dic = new Dictionary<Type, IDictionary>();
 
-	private static Dictionary<Type, IList> dicList = new Dictionary<Type, IList>();
+    private static Dictionary<Type, IList> dicList = new Dictionary<Type, IList>();
 
     public static T GetData<T>(int _id) where T : CsvBase
     {
@@ -30,9 +30,9 @@ public class StaticData
     {
         Dictionary<int, T> dict = GetDic<T>();
 
-		Type type = typeof(T);
+        Type type = typeof(T);
 
-		FieldInfo field = type.GetField(key);
+        FieldInfo field = type.GetField(key);
 
         foreach (T item in dict.Values)
         {
@@ -49,56 +49,61 @@ public class StaticData
 
     public static Dictionary<int, T> GetDic<T>() where T : CsvBase
     {
-		Type type = typeof(T);
+        Type type = typeof(T);
 
-		if (!dic.ContainsKey(type))
-		{
+        if (!dic.ContainsKey(type))
+        {
             Console.WriteLine("not find: " + type);
-		}
-		
-		return dic[type] as Dictionary<int, T>;
+        }
+
+        return dic[type] as Dictionary<int, T>;
     }
 
     public static List<T> GetList<T>() where T : CsvBase
     {
-		Type type = typeof(T);
+        Type type = typeof(T);
 
-		if(dicList.ContainsKey(type)){
+        if (dicList.ContainsKey(type))
+        {
 
-			return dicList[type] as List<T>;
+            return dicList[type] as List<T>;
 
-		}else{
+        }
+        else
+        {
 
-	        Dictionary<int, T> dict = GetDic<T>();
+            Dictionary<int, T> dict = GetDic<T>();
 
-	        List<T> list = new List<T>();
+            List<T> list = new List<T>();
 
-			Dictionary<int,T>.ValueCollection.Enumerator enumerator = dict.Values.GetEnumerator();
+            Dictionary<int, T>.ValueCollection.Enumerator enumerator = dict.Values.GetEnumerator();
 
-			while(enumerator.MoveNext()){
+            while (enumerator.MoveNext())
+            {
 
-				list.Add(enumerator.Current);
-			}
+                list.Add(enumerator.Current);
+            }
 
-			dicList.Add(type,list);
+            dicList.Add(type, list);
 
-	        return list;
-		}
+            return list;
+        }
     }
 
-	public static bool IsIDExists<T>(int _id)where T : CsvBase{
+    public static bool IsIDExists<T>(int _id) where T : CsvBase
+    {
 
-		Dictionary<int, T> dict = GetDic<T>();
+        Dictionary<int, T> dict = GetDic<T>();
 
-		return dict.ContainsKey(_id);
-	}
-    
+        return dict.ContainsKey(_id);
+    }
+
     public static void Dispose()
     {
         dic = new Dictionary<Type, IDictionary>();
     }
 
-    public static void Load<T>(string _name) where T : CsvBase , new()
+    public static void Load<T>(string _name) where T : CsvBase, new()
     {
         Type type = typeof(T);
 
@@ -109,7 +114,7 @@ public class StaticData
 
         Dictionary<int, T> result = new Dictionary<int, T>();
 
-		using (FileStream fs = new FileStream(path + "/" + _name + ".csv", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+        using (FileStream fs = new FileStream(path + "/" + _name + ".csv", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
         {
             using (StreamReader reader = new StreamReader(fs))
             {
@@ -150,7 +155,7 @@ public class StaticData
                             }
                         }
 
-						csv.Fix();
+                        csv.Fix();
 
                         result.Add(csv.ID, csv);
                     }

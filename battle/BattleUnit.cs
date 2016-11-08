@@ -21,24 +21,38 @@ internal class BattleUnit
         mPlayer = _mPlayer;
         oPlayer = _oPlayer;
 
-        battle.ServerStart(_mapID, _mCards, _oCards, _isVsAi);
+        MapSDS mapSDS = StaticData.GetData<MapSDS>(_mapID);
+
+        Dictionary<int, int> heros = null;
+
+        if (mapSDS.heroID.Length > 0)
+        {
+            heros = new Dictionary<int, int>();
+
+            for (int i = 0; i < mapSDS.heroID.Length; i++)
+            {
+                heros.Add(mapSDS.heroPos[i], mapSDS.heroID[i]);
+            }
+        }
+
+        battle.ServerStart(_mapID, heros, _mCards, _oCards, _isVsAi);
     }
 
     internal void RefreshData(IUnit _player)
     {
         battle.ServerRefreshData(_player == mPlayer);
     }
-    
-    internal void ReceiveData(IUnit _playerUnit,byte[] _bytes)
+
+    internal void ReceiveData(IUnit _playerUnit, byte[] _bytes)
     {
         battle.ServerGetPackage(_bytes, _playerUnit == mPlayer);
     }
 
-    private void SendData(bool _isMine,MemoryStream _ms)
+    private void SendData(bool _isMine, MemoryStream _ms)
     {
-        using(MemoryStream ms = new MemoryStream())
+        using (MemoryStream ms = new MemoryStream())
         {
-            using(BinaryWriter bw = new BinaryWriter(ms))
+            using (BinaryWriter bw = new BinaryWriter(ms))
             {
                 bw.Write((short)0);
 
