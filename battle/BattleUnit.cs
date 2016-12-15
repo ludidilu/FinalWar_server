@@ -1,6 +1,7 @@
 ﻿using FinalWar;
 using System.IO;
 using System.Collections.Generic;
+using publicTools;
 
 internal class BattleUnit
 {
@@ -33,6 +34,24 @@ internal class BattleUnit
             {
                 heros.Add(mapSDS.heroPos[i], mapSDS.heroID[i]);
             }
+        }
+
+        if (_mCards.Count > Battle.DECK_CARD_NUM)
+        {
+            _mCards = new List<int>(_mCards);
+
+            PublicTools.ShuffleList(_mCards, Battle.random);
+
+            _mCards = _mCards.GetRange(0, Battle.DECK_CARD_NUM);
+        }
+
+        if (_oCards.Count > Battle.DECK_CARD_NUM)
+        {
+            _oCards = new List<int>(_oCards);
+
+            PublicTools.ShuffleList(_oCards, Battle.random);
+
+            _oCards = _oCards.GetRange(0, Battle.DECK_CARD_NUM);
         }
 
         battle.ServerStart(_mapID, heros, _mCards, _oCards, _isVsAi);
