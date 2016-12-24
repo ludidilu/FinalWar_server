@@ -18,6 +18,8 @@ internal class BattleManager
         }
     }
 
+    private const int mapID = 2;
+
     private Queue<BattleUnit> battleUnitPool = new Queue<BattleUnit>();
 
     private Dictionary<BattleUnit, List<IUnit>> battleList = new Dictionary<BattleUnit, List<IUnit>>();
@@ -134,7 +136,7 @@ internal class BattleManager
 
                     oCards = new List<int>(StaticData.GetData<TestCardsSDS>(2).cards);
 
-                    battleUnit.Init(_playerUnit, tmpPlayer, mCards, oCards, 1, false);
+                    battleUnit.Init(_playerUnit, tmpPlayer, mCards, oCards, mapID, false);
                 }
 
                 break;
@@ -158,7 +160,7 @@ internal class BattleManager
 
                 oCards = new List<int>(StaticData.GetData<TestCardsSDS>(2).cards);
 
-                battleUnit.Init(_playerUnit, null, mCards, oCards, 1, true);
+                battleUnit.Init(_playerUnit, null, mCards, oCards, mapID, true);
 
                 break;
 
