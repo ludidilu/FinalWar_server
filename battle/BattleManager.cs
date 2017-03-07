@@ -20,7 +20,7 @@ internal class BattleManager
 
     private const int mapID = 2;
 
-    private Queue<BattleUnit> battleUnitPool = new Queue<BattleUnit>();
+    private LinkedList<BattleUnit> battleUnitPool = new LinkedList<BattleUnit>();
 
     private Dictionary<BattleUnit, List<IUnit>> battleList = new Dictionary<BattleUnit, List<IUnit>>();
 
@@ -115,7 +115,9 @@ internal class BattleManager
                 {
                     if (battleUnitPool.Count > 0)
                     {
-                        battleUnit = battleUnitPool.Dequeue();
+                        battleUnit = battleUnitPool.Last.Value;
+
+                        battleUnitPool.RemoveLast();
                     }
                     else
                     {
@@ -145,7 +147,9 @@ internal class BattleManager
 
                 if (battleUnitPool.Count > 0)
                 {
-                    battleUnit = battleUnitPool.Dequeue();
+                    battleUnit = battleUnitPool.Last.Value;
+
+                    battleUnitPool.RemoveLast();
                 }
                 else
                 {
@@ -201,7 +205,7 @@ internal class BattleManager
 
         battleList.Remove(_battleUnit);
 
-        battleUnitPool.Enqueue(_battleUnit);
+        battleUnitPool.AddLast(_battleUnit);
     }
 }
 
