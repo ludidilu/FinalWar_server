@@ -8,7 +8,7 @@ internal class Server<T> where T : IUnit, new()
 {
     private Socket socket;
 
-    private List<ServerUnit<T>> noLoginList = new List<ServerUnit<T>>();
+    private LinkedList<ServerUnit<T>> noLoginList = new LinkedList<ServerUnit<T>>();
 
     private Dictionary<int, ServerUnit<T>> loginDic = new Dictionary<int, ServerUnit<T>>();
 
@@ -42,7 +42,7 @@ internal class Server<T> where T : IUnit, new()
 
         lock (noLoginList)
         {
-            noLoginList.Add(serverUnit);
+            noLoginList.AddLast(serverUnit);
 
             serverUnit.Init(clientSocket, tick);
         }
@@ -56,21 +56,25 @@ internal class Server<T> where T : IUnit, new()
         {
             tick++;
 
-            for (int i = noLoginList.Count - 1; i > -1; i--)
+            LinkedListNode<ServerUnit<T>> node = noLoginList.First;
+
+            while (node != null)
             {
-                ServerUnit<T> serverUnit = noLoginList[i];
+                LinkedListNode<ServerUnit<T>> nextNode = node.Next;
+
+                ServerUnit<T> serverUnit = node.Value;
 
                 int uid = serverUnit.CheckLogin(tick);
 
                 if (uid == -1)
                 {
-                    noLoginList.RemoveAt(i);
+                    noLoginList.Remove(node);
                 }
                 else if (uid > 0)
                 {
                     Console.WriteLine("One user login   uid:" + uid);
 
-                    noLoginList.RemoveAt(i);
+                    noLoginList.Remove(node);
 
                     if (loginDic.ContainsKey(uid))
                     {
@@ -101,10 +105,12 @@ internal class Server<T> where T : IUnit, new()
                         loginDic.Add(uid, serverUnit);
                     }
                 }
+
+                node = nextNode;
             }
         }
 
-        List<KeyValuePair<int, ServerUnit<T>>> kickList = null;
+        LinkedList<KeyValuePair<int, ServerUnit<T>>> kickList = null;
 
         Dictionary<int, ServerUnit<T>>.Enumerator enumerator = loginDic.GetEnumerator();
 
@@ -116,18 +122,20 @@ internal class Server<T> where T : IUnit, new()
             {
                 if (kickList == null)
                 {
-                    kickList = new List<KeyValuePair<int, ServerUnit<T>>>();
+                    kickList = new LinkedList<KeyValuePair<int, ServerUnit<T>>>();
                 }
 
-                kickList.Add(enumerator.Current);
+                kickList.AddLast(enumerator.Current);
             }
         }
 
         if (kickList != null)
         {
-            for (int i = 0; i < kickList.Count; i++)
+            LinkedList<KeyValuePair<int, ServerUnit<T>>>.Enumerator enumerator2 = kickList.GetEnumerator();
+
+            while (enumerator2.MoveNext())
             {
-                KeyValuePair<int, ServerUnit<T>> pair = kickList[i];
+                KeyValuePair<int, ServerUnit<T>> pair = enumerator2.Current;
 
                 loginDic.Remove(pair.Key);
 
