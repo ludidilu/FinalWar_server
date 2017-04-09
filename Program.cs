@@ -26,6 +26,8 @@ namespace FinalWar_server
 
             StaticData.Load<TestCardsSDS>("testCards");
 
+            StaticData.Load<HeroTypeSDS>("heroType");
+
             StaticData.Load<HeroSDS>("hero");
 
             Dictionary<int, HeroSDS> heroDic = StaticData.GetDic<HeroSDS>();

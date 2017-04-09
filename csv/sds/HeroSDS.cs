@@ -1,50 +1,59 @@
-﻿public class HeroSDS : CsvBase, IHeroSDS
+﻿public partial class HeroSDS : CsvBase, IHeroSDS
 {
     public int hp;
     public int shield;
     public int power;
     public int cost;
-    public bool canControl;
+    public int heroType;
     public int attack;
-    public int abilityType;
     public int[] skills;
     public int[] auras;
+
+    public HeroTypeSDS heroTypeFix;
 
     public int GetID()
     {
         return ID;
     }
+
     public int GetHp()
     {
         return hp;
     }
+
     public int GetShield()
     {
         return shield;
     }
+
     public int GetCost()
     {
         return cost;
     }
-    public bool GetCanControl()
+
+    public IHeroTypeSDS GetHeroType()
     {
-        return canControl;
+        return heroTypeFix;
     }
+
     public int GetAttack()
     {
         return attack;
     }
-    public AbilityType GetAbilityType()
-    {
-        return (AbilityType)abilityType;
-    }
+
     public int[] GetSkills()
     {
         return skills;
     }
+
     public int[] GetAuras()
     {
         return auras;
+    }
+
+    public override void Fix()
+    {
+        heroTypeFix = StaticData.GetData<HeroTypeSDS>(heroType);
     }
 }
 
