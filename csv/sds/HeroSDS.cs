@@ -8,6 +8,7 @@
     public int attack;
     public int skill;
     public int[] auras;
+    public int levelUp;
 
     public HeroTypeSDS heroTypeFix;
 
@@ -49,6 +50,11 @@
     public int[] GetAuras()
     {
         return auras;
+    }
+
+    public int GetLevelUp()
+    {
+        return levelUp;
     }
 
     public override void Fix()

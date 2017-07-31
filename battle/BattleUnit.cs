@@ -1,7 +1,6 @@
 ﻿using FinalWar;
 using System.IO;
 using System.Collections.Generic;
-using collectionTools;
 
 internal class BattleUnit
 {
@@ -38,19 +37,11 @@ internal class BattleUnit
 
         if (_mCards.Count > Battle.DECK_CARD_NUM)
         {
-            _mCards = new List<int>(_mCards);
-
-            CollectionTools.ShuffleList(_mCards, Battle.random);
-
             _mCards = _mCards.GetRange(0, Battle.DECK_CARD_NUM);
         }
 
         if (_oCards.Count > Battle.DECK_CARD_NUM)
         {
-            _oCards = new List<int>(_oCards);
-
-            CollectionTools.ShuffleList(_oCards, Battle.random);
-
             _oCards = _oCards.GetRange(0, Battle.DECK_CARD_NUM);
         }
 
