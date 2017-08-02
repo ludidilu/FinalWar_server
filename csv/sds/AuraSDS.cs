@@ -1,14 +1,26 @@
 ﻿public partial class AuraSDS : CsvBase, IAuraSDS
 {
-    public int auraEffect;
-    public int auraData;
+    public string eventName;
+    public int auraType;
+    public int auraTarget;
+    public int[] auraData;
 
-    public AuraEffect GetAuraEffect()
+    public string GetEventName()
     {
-        return (AuraEffect)auraEffect;
+        return eventName;
     }
 
-    public int GetAuraData()
+    public AuraType GetAuraType()
+    {
+        return (AuraType)auraType;
+    }
+
+    public AuraTarget GetAuraTarget()
+    {
+        return (AuraTarget)auraTarget;
+    }
+
+    public int[] GetAuraData()
     {
         return auraData;
     }

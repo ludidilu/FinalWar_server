@@ -2,7 +2,7 @@
 {
     public bool isStop;
     public int skillEffect;
-    public int skillData;
+    public int[] skillData;
 
     public bool GetIsStop()
     {
@@ -14,7 +14,7 @@
         return (SkillEffect)skillEffect;
     }
 
-    public int GetSkillData()
+    public int[] GetSkillData()
     {
         return skillData;
     }
