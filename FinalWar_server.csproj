@@ -73,6 +73,7 @@
     <Compile Include="config\ConfigDictionary.cs" />
     <Compile Include="csv\CsvBase.cs" />
     <Compile Include="csv\sds\AuraSDS.cs" />
+    <Compile Include="csv\sds\EffectSDS.cs" />
     <Compile Include="csv\sds\HeroSDS.cs" />
     <Compile Include="csv\sds\HeroTypeSDS.cs" />
     <Compile Include="csv\sds\MapSDS.cs" />
