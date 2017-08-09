@@ -35,14 +35,14 @@ internal class BattleUnit
             }
         }
 
-        if (_mCards.Count > Battle.DECK_CARD_NUM)
+        if (_mCards.Count > BattleConst.DECK_CARD_NUM)
         {
-            _mCards = _mCards.GetRange(0, Battle.DECK_CARD_NUM);
+            _mCards = _mCards.GetRange(0, BattleConst.DECK_CARD_NUM);
         }
 
-        if (_oCards.Count > Battle.DECK_CARD_NUM)
+        if (_oCards.Count > BattleConst.DECK_CARD_NUM)
         {
-            _oCards = _oCards.GetRange(0, Battle.DECK_CARD_NUM);
+            _oCards = _oCards.GetRange(0, BattleConst.DECK_CARD_NUM);
         }
 
         battle.ServerStart(_mapID, heros, _mCards, _oCards, _isVsAi);
