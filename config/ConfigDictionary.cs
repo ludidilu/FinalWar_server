@@ -21,4 +21,6 @@ public class ConfigDictionary : Config
 
     public string table_path;
     public string map_path;
+    public string random_path;
+    public int port;
 }

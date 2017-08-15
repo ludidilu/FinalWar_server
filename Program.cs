@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using FinalWar;
+using System.IO;
 
 namespace FinalWar_server
 {
@@ -18,6 +19,14 @@ namespace FinalWar_server
 
             ConfigDictionary.Instance.LoadLocalConfig("local.xml");
 
+            using (FileStream fs = new FileStream(Path.Combine(ConfigDictionary.Instance.random_path, "random.dat"), FileMode.Open))
+            {
+                using (BinaryReader br = new BinaryReader(fs))
+                {
+                    BattleRandomPool.Load(br);
+                }
+            }
+
             StaticData.path = ConfigDictionary.Instance.table_path;
 
             StaticData.Load<MapSDS>("map");
@@ -27,6 +36,10 @@ namespace FinalWar_server
             StaticData.Load<TestCardsSDS>("testCards");
 
             StaticData.Load<HeroTypeSDS>("heroType");
+
+            StaticData.Load<MapSDS>("map");
+
+            Dictionary<int, MapSDS> mapDic = StaticData.GetDic<MapSDS>();
 
             StaticData.Load<HeroSDS>("hero");
 
@@ -44,11 +57,11 @@ namespace FinalWar_server
 
             Dictionary<int, AuraSDS> auraDic = StaticData.GetDic<AuraSDS>();
 
-            Battle.Init(Map.mapDataDic, heroDic, skillDic, auraDic, effectDic);
+            Battle.Init(mapDic, heroDic, skillDic, auraDic, effectDic);
 
             Server<PlayerUnit> server = new Server<PlayerUnit>();
 
-            server.Start("0.0.0.0", 1983, 100);
+            server.Start("0.0.0.0", ConfigDictionary.Instance.port, 100);
 
             while (true)
             {

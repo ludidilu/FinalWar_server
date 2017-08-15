@@ -56,8 +56,9 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FinalWar_lib">
-      <HintPath>..\FinalWar_lib\bin\x64\Debug\FinalWar_lib.dll</HintPath>
+    <Reference Include="FinalWar_lib, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\FinalWar_lib\bin\x64\Server\FinalWar_lib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

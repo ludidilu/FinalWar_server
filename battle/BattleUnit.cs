@@ -7,11 +7,11 @@ internal class BattleUnit
     private IUnit mPlayer;
     private IUnit oPlayer;
 
-    private Battle battle;
+    private Battle_server battle;
 
     internal BattleUnit()
     {
-        battle = new Battle();
+        battle = new Battle_server();
 
         battle.ServerSetCallBack(SendData, BattleOver);
     }
@@ -45,7 +45,7 @@ internal class BattleUnit
             _oCards = _oCards.GetRange(0, BattleConst.DECK_CARD_NUM);
         }
 
-        battle.ServerStart(_mapID, heros, _mCards, _oCards, _isVsAi);
+        battle.ServerStart(_mapID, _mCards, _oCards);
     }
 
     internal void RefreshData(IUnit _player)
@@ -84,7 +84,7 @@ internal class BattleUnit
         }
     }
 
-    private void BattleOver()
+    private void BattleOver(Battle.BattleResult _result)
     {
         BattleManager.Instance.BattleOver(this);
     }
