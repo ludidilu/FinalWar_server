@@ -21,31 +21,7 @@ internal class BattleUnit
         mPlayer = _mPlayer;
         oPlayer = _oPlayer;
 
-        MapSDS mapSDS = StaticData.GetData<MapSDS>(_mapID);
-
-        Dictionary<int, int> heros = null;
-
-        if (mapSDS.heroID.Length > 0)
-        {
-            heros = new Dictionary<int, int>();
-
-            for (int i = 0; i < mapSDS.heroID.Length; i++)
-            {
-                heros.Add(mapSDS.heroPos[i], mapSDS.heroID[i]);
-            }
-        }
-
-        if (_mCards.Count > BattleConst.DECK_CARD_NUM)
-        {
-            _mCards = _mCards.GetRange(0, BattleConst.DECK_CARD_NUM);
-        }
-
-        if (_oCards.Count > BattleConst.DECK_CARD_NUM)
-        {
-            _oCards = _oCards.GetRange(0, BattleConst.DECK_CARD_NUM);
-        }
-
-        battle.ServerStart(_mapID, _mCards, _oCards);
+        battle.ServerStart(_mapID, _mCards, _oCards, _isVsAi);
     }
 
     internal void RefreshData(IUnit _player)

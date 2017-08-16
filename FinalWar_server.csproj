@@ -81,7 +81,6 @@
     <Compile Include="csv\sds\SkillSDS.cs" />
     <Compile Include="csv\sds\TestCardsSDS.cs" />
     <Compile Include="csv\StaticData.cs" />
-    <Compile Include="map\Map.cs" />
     <Compile Include="player\IUnit.cs" />
     <Compile Include="player\PlayerUnit.cs" />
     <Compile Include="Program.cs" />
