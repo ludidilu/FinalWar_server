@@ -8,14 +8,9 @@ namespace FinalWar_server
 {
     class Program
     {
-        private static void WriteLog(string _str)
-        {
-            Console.WriteLine(_str);
-        }
-
         static void Main(string[] args)
         {
-            Log.Init(WriteLog);
+            Log.Init(Console.WriteLine);
 
             ConfigDictionary.Instance.LoadLocalConfig("local.xml");
 
@@ -56,6 +51,8 @@ namespace FinalWar_server
             Dictionary<int, AuraSDS> auraDic = StaticData.GetDic<AuraSDS>();
 
             Battle.Init(mapDic, heroDic, skillDic, auraDic, effectDic);
+
+            MapSDS.Load(null);
 
             Server<PlayerUnit> server = new Server<PlayerUnit>();
 
