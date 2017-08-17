@@ -97,9 +97,9 @@ internal class BattleManager
     {
         BattleUnit battleUnit;
 
-        List<int> mCards;
+        IList<int> mCards;
 
-        List<int> oCards;
+        IList<int> oCards;
 
         switch (_type)
         {
@@ -134,9 +134,9 @@ internal class BattleManager
 
                     battleList.Add(battleUnit, new List<IUnit>() { _playerUnit, tmpPlayer });
 
-                    mCards = new List<int>(StaticData.GetData<TestCardsSDS>(1).cards);
+                    mCards = StaticData.GetData<TestCardsSDS>(1).cards;
 
-                    oCards = new List<int>(StaticData.GetData<TestCardsSDS>(2).cards);
+                    oCards = StaticData.GetData<TestCardsSDS>(2).cards;
 
                     battleUnit.Init(_playerUnit, tmpPlayer, mCards, oCards, mapID, false);
                 }
@@ -160,9 +160,9 @@ internal class BattleManager
 
                 battleList.Add(battleUnit, new List<IUnit>() { _playerUnit });
 
-                mCards = new List<int>(StaticData.GetData<TestCardsSDS>(1).cards);
+                mCards = StaticData.GetData<TestCardsSDS>(1).cards;
 
-                oCards = new List<int>(StaticData.GetData<TestCardsSDS>(2).cards);
+                oCards = StaticData.GetData<TestCardsSDS>(2).cards;
 
                 battleUnit.Init(_playerUnit, null, mCards, oCards, mapID, true);
 
