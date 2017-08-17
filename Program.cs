@@ -12,6 +12,22 @@ namespace FinalWar_server
         {
             Log.Init(Console.WriteLine);
 
+            ResourceLoad();
+
+            Server<PlayerUnit> server = new Server<PlayerUnit>();
+
+            server.Start("0.0.0.0", ConfigDictionary.Instance.port, 100);
+
+            while (true)
+            {
+                server.Update();
+
+                Thread.Sleep(10);
+            }
+        }
+
+        private static void ResourceLoad()
+        {
             ConfigDictionary.Instance.LoadLocalConfig("local.xml");
 
             using (FileStream fs = new FileStream(Path.Combine(ConfigDictionary.Instance.random_path, "random.dat"), FileMode.Open))
@@ -54,16 +70,10 @@ namespace FinalWar_server
 
             MapSDS.Load(null);
 
-            Server<PlayerUnit> server = new Server<PlayerUnit>();
+            string actionStr = File.ReadAllText(ConfigDictionary.Instance.ai_path + "ai_action.xml");
+            string summonStr = File.ReadAllText(ConfigDictionary.Instance.ai_path + "ai_summon.xml");
 
-            server.Start("0.0.0.0", ConfigDictionary.Instance.port, 100);
-
-            while (true)
-            {
-                server.Update();
-
-                Thread.Sleep(10);
-            }
+            BattleAi.Init(actionStr, summonStr);
         }
     }
 }

@@ -52,7 +52,7 @@ internal class BattleUnit
                 {
                     mPlayer.SendData(ms);
                 }
-                else
+                else if (oPlayer != null)
                 {
                     oPlayer.SendData(ms);
                 }
