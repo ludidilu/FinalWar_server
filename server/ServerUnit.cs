@@ -14,7 +14,11 @@ internal class ServerUnit<T> where T : IUnit, new()
 
     private ushort bodyLength;
 
+    private byte[] uidBuffer = new byte[UID_LENGTH];
+
     private byte[] headBuffer = new byte[HEAD_LENGTH];
+
+    private byte[] bodyBuffer = new byte[short.MaxValue];
 
     internal T unit { get; private set; }
 
@@ -60,11 +64,9 @@ internal class ServerUnit<T> where T : IUnit, new()
         }
         else if (socket.Available >= UID_LENGTH)
         {
-            byte[] bytes = new byte[UID_LENGTH];
+            socket.Receive(uidBuffer, UID_LENGTH, SocketFlags.None);
 
-            socket.Receive(bytes, UID_LENGTH, SocketFlags.None);
-
-            int uid = BitConverter.ToInt32(bytes, 0);
+            int uid = BitConverter.ToInt32(uidBuffer, 0);
 
             if (uid < 1)
             {
@@ -124,8 +126,6 @@ internal class ServerUnit<T> where T : IUnit, new()
         {
             lastTick = _tick;
 
-            byte[] bodyBuffer = new byte[bodyLength];
-
             socket.Receive(bodyBuffer, bodyLength, SocketFlags.None);
 
             isReceiveHead = true;
@@ -140,13 +140,11 @@ internal class ServerUnit<T> where T : IUnit, new()
     {
         int length = HEAD_LENGTH + (int)_ms.Length;
 
-        byte[] bytes = new byte[length];
+        Array.Copy(BitConverter.GetBytes((ushort)_ms.Length), bodyBuffer, HEAD_LENGTH);
 
-        Array.Copy(BitConverter.GetBytes((ushort)_ms.Length), bytes, HEAD_LENGTH);
+        Array.Copy(_ms.GetBuffer(), 0, bodyBuffer, HEAD_LENGTH, _ms.Length);
 
-        Array.Copy(_ms.GetBuffer(), 0, bytes, HEAD_LENGTH, _ms.Length);
-
-        socket.BeginSend(bytes, 0, length, SocketFlags.None, SendCallBack, null);
+        socket.BeginSend(bodyBuffer, 0, length, SocketFlags.None, SendCallBack, null);
     }
 
     private void SendCallBack(IAsyncResult _result)
