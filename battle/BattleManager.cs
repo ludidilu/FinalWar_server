@@ -20,7 +20,11 @@ internal class BattleManager
 
     private const int mapID = 2;
 
-    private LinkedList<BattleUnit> battleUnitPool = new LinkedList<BattleUnit>();
+    private const bool isBattle = false;
+
+    private Queue<BattleUnit> battleUnitPool1 = new Queue<BattleUnit>();
+
+    private Queue<BattleUnit> battleUnitPool2 = new Queue<BattleUnit>();
 
     private Dictionary<BattleUnit, List<IUnit>> battleList = new Dictionary<BattleUnit, List<IUnit>>();
 
@@ -113,16 +117,7 @@ internal class BattleManager
                 }
                 else
                 {
-                    if (battleUnitPool.Count > 0)
-                    {
-                        battleUnit = battleUnitPool.Last.Value;
-
-                        battleUnitPool.RemoveLast();
-                    }
-                    else
-                    {
-                        battleUnit = new BattleUnit();
-                    }
+                    battleUnit = GetBattleUnit(isBattle);
 
                     IUnit tmpPlayer = lastPlayer;
 
@@ -145,16 +140,7 @@ internal class BattleManager
 
             case 1:
 
-                if (battleUnitPool.Count > 0)
-                {
-                    battleUnit = battleUnitPool.Last.Value;
-
-                    battleUnitPool.RemoveLast();
-                }
-                else
-                {
-                    battleUnit = new BattleUnit();
-                }
+                battleUnit = GetBattleUnit(isBattle);
 
                 battleListWithPlayer.Add(_playerUnit, battleUnit);
 
@@ -205,7 +191,39 @@ internal class BattleManager
 
         battleList.Remove(_battleUnit);
 
-        battleUnitPool.AddLast(_battleUnit);
+        ReleaseBattleUnit(_battleUnit);
+    }
+
+    private BattleUnit GetBattleUnit(bool _isBattle)
+    {
+        BattleUnit battleUnit;
+
+        if (_isBattle && battleUnitPool1.Count > 0)
+        {
+            battleUnit = battleUnitPool1.Dequeue();
+        }
+        else if (!_isBattle && battleUnitPool2.Count > 0)
+        {
+            battleUnit = battleUnitPool2.Dequeue();
+        }
+        else
+        {
+            battleUnit = new BattleUnit(_isBattle);
+        }
+
+        return battleUnit;
+    }
+
+    private void ReleaseBattleUnit(BattleUnit _battleUnit)
+    {
+        if (_battleUnit.isBattle)
+        {
+            battleUnitPool1.Enqueue(_battleUnit);
+        }
+        else
+        {
+            battleUnitPool2.Enqueue(_battleUnit);
+        }
     }
 }
 

@@ -9,9 +9,13 @@ internal class BattleUnit
 
     private Battle_server battle;
 
-    internal BattleUnit()
+    internal bool isBattle { private set; get; }
+
+    internal BattleUnit(bool _isBattle)
     {
-        battle = new Battle_server();
+        isBattle = _isBattle;
+
+        battle = new Battle_server(isBattle);
 
         battle.ServerSetCallBack(SendData, BattleOver);
     }
