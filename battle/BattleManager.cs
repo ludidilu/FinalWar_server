@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Connection;
+using System;
 
 internal class BattleManager
 {
@@ -47,7 +48,7 @@ internal class BattleManager
 
     private UnitBase lastPlayer = null;
 
-    internal MemoryStream PlayerEnter(UnitBase _playerUnit)
+    internal void PlayerEnter(UnitBase _playerUnit, Action<MemoryStream> _callBack)
     {
         PlayerState playerState;
 
@@ -73,7 +74,7 @@ internal class BattleManager
             {
                 bw.Write((short)playerState);
 
-                return ms;
+                _callBack(ms);
             }
         }
     }

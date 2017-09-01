@@ -40,7 +40,10 @@ internal class BattleUnit
         {
             using (BinaryWriter bw = new BinaryWriter(ms))
             {
-                bw.Write(true);
+                if (_isPush)
+                {
+                    bw.Write(true);
+                }
 
                 bw.Write(_ms.GetBuffer(), 0, (int)_ms.Length);
 
