@@ -1,11 +1,12 @@
 ﻿using FinalWar;
 using System.IO;
 using System.Collections.Generic;
+using Connection;
 
 internal class BattleUnit
 {
-    private IUnit mPlayer;
-    private IUnit oPlayer;
+    private UnitBase mPlayer;
+    private UnitBase oPlayer;
 
     private Battle_server battle;
 
@@ -20,7 +21,7 @@ internal class BattleUnit
         battle.ServerSetCallBack(SendData, BattleOver);
     }
 
-    internal void Init(IUnit _mPlayer, IUnit _oPlayer, IList<int> _mCards, IList<int> _oCards, int _mapID, bool _isVsAi)
+    internal void Init(UnitBase _mPlayer, UnitBase _oPlayer, IList<int> _mCards, IList<int> _oCards, int _mapID, bool _isVsAi)
     {
         mPlayer = _mPlayer;
         oPlayer = _oPlayer;
@@ -28,37 +29,28 @@ internal class BattleUnit
         battle.ServerStart(_mapID, _mCards, _oCards, _isVsAi);
     }
 
-    internal void RefreshData(IUnit _player)
+    internal void ReceiveData(UnitBase _playerUnit, BinaryReader _br)
     {
-        battle.ServerRefreshData(_player == mPlayer);
+        battle.ServerGetPackage(_br, _playerUnit == mPlayer);
     }
 
-    internal void ReceiveData(IUnit _playerUnit, byte[] _bytes)
-    {
-        battle.ServerGetPackage(_bytes, _playerUnit == mPlayer);
-    }
-
-    private void SendData(bool _isMine, MemoryStream _ms)
+    private void SendData(bool _isMine, bool _isPush, MemoryStream _ms)
     {
         using (MemoryStream ms = new MemoryStream())
         {
             using (BinaryWriter bw = new BinaryWriter(ms))
             {
-                bw.Write((short)0);
+                bw.Write(true);
 
-                short length = (short)_ms.Length;
-
-                bw.Write(length);
-
-                bw.Write(_ms.GetBuffer(), 0, length);
+                bw.Write(_ms.GetBuffer(), 0, (int)_ms.Length);
 
                 if (_isMine)
                 {
-                    mPlayer.SendData(ms);
+                    mPlayer.SendData(_isPush, ms);
                 }
                 else if (oPlayer != null)
                 {
-                    oPlayer.SendData(ms);
+                    oPlayer.SendData(_isPush, ms);
                 }
             }
         }

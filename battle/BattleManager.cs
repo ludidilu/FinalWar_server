@@ -1,8 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Connection;
 
 internal class BattleManager
 {
+    enum PlayerState
+    {
+        FREE,
+        SEARCHING,
+        BATTLE
+    }
+
+    internal enum PackageData
+    {
+        PVP,
+        PVE,
+        CANCEL_SEARCH
+    }
+
     private static BattleManager _Instance;
 
     internal static BattleManager Instance
@@ -26,78 +41,80 @@ internal class BattleManager
 
     private Queue<BattleUnit> battleUnitPool2 = new Queue<BattleUnit>();
 
-    private Dictionary<BattleUnit, List<IUnit>> battleList = new Dictionary<BattleUnit, List<IUnit>>();
+    private Dictionary<BattleUnit, List<UnitBase>> battleList = new Dictionary<BattleUnit, List<UnitBase>>();
 
-    private Dictionary<IUnit, BattleUnit> battleListWithPlayer = new Dictionary<IUnit, BattleUnit>();
+    private Dictionary<UnitBase, BattleUnit> battleListWithPlayer = new Dictionary<UnitBase, BattleUnit>();
 
-    private IUnit lastPlayer = null;
+    private UnitBase lastPlayer = null;
 
-    internal void PlayerEnter(IUnit _playerUnit)
+    internal MemoryStream PlayerEnter(UnitBase _playerUnit)
     {
+        PlayerState playerState;
+
         if (battleListWithPlayer.ContainsKey(_playerUnit))
         {
-            battleListWithPlayer[_playerUnit].RefreshData(_playerUnit);
+            playerState = PlayerState.BATTLE;
         }
         else
         {
             if (_playerUnit == lastPlayer)
             {
-                ReplyClient(_playerUnit, 1);
+                playerState = PlayerState.SEARCHING;
             }
             else
             {
-                ReplyClient(_playerUnit, 2);
+                playerState = PlayerState.FREE;
+            }
+        }
+
+        using (MemoryStream ms = new MemoryStream())
+        {
+            using (BinaryWriter bw = new BinaryWriter(ms))
+            {
+                bw.Write((short)playerState);
+
+                return ms;
             }
         }
     }
 
-    internal void ReceiveData(IUnit _playerUnit, byte[] _bytes)
+    internal void ReceiveData(UnitBase _playerUnit, byte[] _bytes)
     {
         using (MemoryStream ms = new MemoryStream(_bytes))
         {
             using (BinaryReader br = new BinaryReader(ms))
             {
-                short type = br.ReadInt16();
+                bool isBattle = br.ReadBoolean();
 
-                switch (type)
+                if (isBattle)
                 {
-                    case 0:
-
-                        if (battleListWithPlayer.ContainsKey(_playerUnit))
+                    if (battleListWithPlayer.ContainsKey(_playerUnit))
+                    {
+                        battleListWithPlayer[_playerUnit].ReceiveData(_playerUnit, br);
+                    }
+                    else
+                    {
+                        if (_playerUnit == lastPlayer)
                         {
-                            short length = br.ReadInt16();
-
-                            byte[] bytes = br.ReadBytes(length);
-
-                            battleListWithPlayer[_playerUnit].ReceiveData(_playerUnit, bytes);
+                            ReplyClient(_playerUnit, false, PlayerState.SEARCHING);
                         }
                         else
                         {
-                            if (_playerUnit == lastPlayer)
-                            {
-                                ReplyClient(_playerUnit, 1);
-                            }
-                            else
-                            {
-                                ReplyClient(_playerUnit, 2);
-                            }
+                            ReplyClient(_playerUnit, false, PlayerState.FREE);
                         }
+                    }
+                }
+                else
+                {
+                    PackageData data = (PackageData)br.ReadInt16();
 
-                        break;
-
-                    case 1:
-
-                        short actionType = br.ReadInt16();
-
-                        ReceiveActionData(_playerUnit, actionType);
-
-                        break;
+                    ReceiveActionData(_playerUnit, data);
                 }
             }
         }
     }
 
-    private void ReceiveActionData(IUnit _playerUnit, short _type)
+    private void ReceiveActionData(UnitBase _playerUnit, PackageData _data)
     {
         BattleUnit battleUnit;
 
@@ -105,21 +122,21 @@ internal class BattleManager
 
         IList<int> oCards;
 
-        switch (_type)
+        switch (_data)
         {
-            case 0:
+            case PackageData.PVP:
 
                 if (lastPlayer == null)
                 {
                     lastPlayer = _playerUnit;
 
-                    ReplyClient(_playerUnit, 1);
+                    ReplyClient(_playerUnit, false, PlayerState.SEARCHING);
                 }
                 else
                 {
                     battleUnit = GetBattleUnit(isBattle);
 
-                    IUnit tmpPlayer = lastPlayer;
+                    UnitBase tmpPlayer = lastPlayer;
 
                     lastPlayer = null;
 
@@ -127,24 +144,28 @@ internal class BattleManager
 
                     battleListWithPlayer.Add(tmpPlayer, battleUnit);
 
-                    battleList.Add(battleUnit, new List<IUnit>() { _playerUnit, tmpPlayer });
+                    battleList.Add(battleUnit, new List<UnitBase>() { _playerUnit, tmpPlayer });
 
                     mCards = StaticData.GetData<TestCardsSDS>(1).cards;
 
                     oCards = StaticData.GetData<TestCardsSDS>(2).cards;
 
                     battleUnit.Init(_playerUnit, tmpPlayer, mCards, oCards, mapID, false);
+
+                    ReplyClient(_playerUnit, false, PlayerState.BATTLE);
+
+                    ReplyClient(tmpPlayer, true, PlayerState.BATTLE);
                 }
 
                 break;
 
-            case 1:
+            case PackageData.PVE:
 
                 battleUnit = GetBattleUnit(isBattle);
 
                 battleListWithPlayer.Add(_playerUnit, battleUnit);
 
-                battleList.Add(battleUnit, new List<IUnit>() { _playerUnit });
+                battleList.Add(battleUnit, new List<UnitBase>() { _playerUnit });
 
                 mCards = StaticData.GetData<TestCardsSDS>(1).cards;
 
@@ -152,37 +173,41 @@ internal class BattleManager
 
                 battleUnit.Init(_playerUnit, null, mCards, oCards, mapID, true);
 
+                ReplyClient(_playerUnit, false, PlayerState.BATTLE);
+
                 break;
 
-            case 2:
+            case PackageData.CANCEL_SEARCH:
 
                 if (lastPlayer == _playerUnit)
                 {
                     lastPlayer = null;
-
-                    ReplyClient(_playerUnit, 2);
                 }
+
+                ReplyClient(_playerUnit, false, PlayerState.FREE);
 
                 break;
         }
     }
 
-    private void ReplyClient(IUnit _playerUnit, short _type)
+    private void ReplyClient(UnitBase _playerUnit, bool _isPush, PlayerState _playerState)
     {
         using (MemoryStream ms = new MemoryStream())
         {
             using (BinaryWriter bw = new BinaryWriter(ms))
             {
-                bw.Write(_type);
+                bw.Write(false);
 
-                _playerUnit.SendData(ms);
+                bw.Write((short)_playerState);
+
+                _playerUnit.SendData(_isPush, ms);
             }
         }
     }
 
     internal void BattleOver(BattleUnit _battleUnit)
     {
-        List<IUnit> tmpList = battleList[_battleUnit];
+        List<UnitBase> tmpList = battleList[_battleUnit];
 
         for (int i = 0; i < tmpList.Count; i++)
         {
@@ -226,4 +251,3 @@ internal class BattleManager
         }
     }
 }
-

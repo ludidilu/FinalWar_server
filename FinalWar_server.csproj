@@ -56,6 +56,9 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Connection">
+      <HintPath>..\Connection\bin\x64\Debug\Connection.dll</HintPath>
+    </Reference>
     <Reference Include="FinalWar_lib, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\FinalWar_lib\bin\x64\Debug\FinalWar_lib.dll</HintPath>
@@ -81,12 +84,9 @@
     <Compile Include="csv\sds\SkillSDS.cs" />
     <Compile Include="csv\sds\TestCardsSDS.cs" />
     <Compile Include="csv\StaticData.cs" />
-    <Compile Include="player\IUnit.cs" />
     <Compile Include="player\PlayerUnit.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="server\Server.cs" />
-    <Compile Include="server\ServerUnit.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

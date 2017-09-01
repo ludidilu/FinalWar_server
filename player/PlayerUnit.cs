@@ -1,31 +1,15 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
+using Connection;
 
-internal class PlayerUnit : IUnit
+internal class PlayerUnit : UnitBase
 {
-    private Action<MemoryStream> sendDataCallBack;
-
-    public void Init(Action<MemoryStream> _sendDataCallBack)
+    public override MemoryStream Login()
     {
-        sendDataCallBack = _sendDataCallBack;
-
-        if (sendDataCallBack != null)
-        {
-            BattleManager.Instance.PlayerEnter(this);
-        }
+        return BattleManager.Instance.PlayerEnter(this);
     }
 
-    public void ReceiveData(byte[] _bytes)
+    public override void ReceiveData(byte[] _bytes)
     {
         BattleManager.Instance.ReceiveData(this, _bytes);
     }
-
-    public void SendData(MemoryStream _ms)
-    {
-        if (sendDataCallBack != null)
-        {
-            sendDataCallBack(_ms);
-        }
-    }
 }
-
