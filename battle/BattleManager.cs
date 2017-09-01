@@ -197,7 +197,10 @@ internal class BattleManager
         {
             using (BinaryWriter bw = new BinaryWriter(ms))
             {
-                bw.Write(false);
+                if (_isPush)
+                {
+                    bw.Write(false);
+                }
 
                 bw.Write((short)_playerState);
 
