@@ -1,12 +1,10 @@
-﻿using System.IO;
-using Connection;
-using System;
+﻿using Connection;
 
 internal class PlayerUnit : UnitBase
 {
-    public override void Login(Action<MemoryStream> _callBack)
+    public override byte[] Login()
     {
-        BattleManager.Instance.PlayerEnter(this, _callBack);
+        return BattleManager.Instance.PlayerEnter(this);
     }
 
     public override void ReceiveData(byte[] _bytes)

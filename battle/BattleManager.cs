@@ -48,7 +48,7 @@ internal class BattleManager
 
     private UnitBase lastPlayer = null;
 
-    internal void PlayerEnter(UnitBase _playerUnit, Action<MemoryStream> _callBack)
+    internal byte[] PlayerEnter(UnitBase _playerUnit)
     {
         PlayerState playerState;
 
@@ -68,15 +68,7 @@ internal class BattleManager
             }
         }
 
-        using (MemoryStream ms = new MemoryStream())
-        {
-            using (BinaryWriter bw = new BinaryWriter(ms))
-            {
-                bw.Write((short)playerState);
-
-                _callBack(ms);
-            }
-        }
+        return BitConverter.GetBytes((short)playerState);
     }
 
     internal void ReceiveData(UnitBase _playerUnit, byte[] _bytes)

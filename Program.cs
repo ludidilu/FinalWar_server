@@ -11,7 +11,9 @@ namespace FinalWar_server
     {
         static void Main(string[] args)
         {
-            Log.Init(Console.WriteLine);
+            Connection.Log.Init(Console.WriteLine);
+
+            FinalWar.Log.Init(Console.WriteLine);
 
             ResourceLoad();
 
