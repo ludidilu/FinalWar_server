@@ -57,7 +57,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Connection">
-      <HintPath>..\Connection\bin\x64\Debug\Connection.dll</HintPath>
+      <HintPath>..\..\Connection\bin\x64\Debug\Connection.dll</HintPath>
     </Reference>
     <Reference Include="FinalWar_lib, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
