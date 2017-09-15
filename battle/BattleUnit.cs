@@ -61,6 +61,8 @@ internal class BattleUnit
 
     private void BattleOver(Battle.BattleResult _result)
     {
+        mPlayer = oPlayer = null;
+
         BattleManager.Instance.BattleOver(this);
     }
 }
