@@ -29,9 +29,9 @@ internal class BattleUnit
         battle.ServerStart(_mapID, _mCards, _oCards, _isVsAi);
     }
 
-    internal void ReceiveData(UnitBase _playerUnit, BinaryReader _br)
+    internal void ReceiveData(UnitBase _playerUnit, BinaryReader _br, long _tick)
     {
-        battle.ServerGetPackage(_br, _playerUnit == mPlayer);
+        battle.ServerGetPackage(_br, _playerUnit == mPlayer, _tick);
     }
 
     private void SendData(bool _isMine, bool _isPush, MemoryStream _ms)
@@ -64,5 +64,10 @@ internal class BattleUnit
         mPlayer = oPlayer = null;
 
         BattleManager.Instance.BattleOver(this);
+    }
+
+    internal void Update(long _tick)
+    {
+        battle.Update(_tick);
     }
 }

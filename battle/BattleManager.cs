@@ -71,7 +71,7 @@ internal class BattleManager
         return BitConverter.GetBytes((short)playerState);
     }
 
-    internal void ReceiveData(UnitBase _playerUnit, byte[] _bytes)
+    internal void ReceiveData(UnitBase _playerUnit, byte[] _bytes, long _tick)
     {
         using (MemoryStream ms = new MemoryStream(_bytes))
         {
@@ -83,7 +83,7 @@ internal class BattleManager
                 {
                     if (battleListWithPlayer.ContainsKey(_playerUnit))
                     {
-                        battleListWithPlayer[_playerUnit].ReceiveData(_playerUnit, br);
+                        battleListWithPlayer[_playerUnit].ReceiveData(_playerUnit, br, _tick);
                     }
                     else
                     {
@@ -244,6 +244,16 @@ internal class BattleManager
         else
         {
             battleUnitPool2.Enqueue(_battleUnit);
+        }
+    }
+
+    internal void Update(long _tick)
+    {
+        Dictionary<BattleUnit, List<UnitBase>>.KeyCollection.Enumerator enumerator = battleList.Keys.GetEnumerator();
+
+        while (enumerator.MoveNext())
+        {
+            enumerator.Current.Update(_tick);
         }
     }
 }

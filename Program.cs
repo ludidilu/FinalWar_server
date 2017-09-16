@@ -23,7 +23,9 @@ namespace FinalWar_server
 
             while (true)
             {
-                server.Update();
+                long tick = server.Update();
+
+                BattleManager.Instance.Update(tick);
 
                 Thread.Sleep(10);
             }
