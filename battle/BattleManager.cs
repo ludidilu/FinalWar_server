@@ -48,19 +48,19 @@ internal class BattleManager
 
     private UnitBase lastPlayer = null;
 
-    internal byte[] PlayerEnter(UnitBase _playerUnit)
+    internal byte[] Login(UnitBase _playerUnit)
     {
         PlayerState playerState;
 
-        if (battleListWithPlayer.ContainsKey(_playerUnit))
+        if (_playerUnit == lastPlayer)
         {
-            playerState = PlayerState.BATTLE;
+            playerState = PlayerState.SEARCHING;
         }
         else
         {
-            if (_playerUnit == lastPlayer)
+            if (battleListWithPlayer.ContainsKey(_playerUnit))
             {
-                playerState = PlayerState.SEARCHING;
+                playerState = PlayerState.BATTLE;
             }
             else
             {
@@ -69,6 +69,23 @@ internal class BattleManager
         }
 
         return BitConverter.GetBytes((short)playerState);
+    }
+
+    internal void Logout(UnitBase _playerUnit)
+    {
+        if (lastPlayer == _playerUnit)
+        {
+            lastPlayer = null;
+        }
+        else
+        {
+            BattleUnit unit;
+
+            if (battleListWithPlayer.TryGetValue(_playerUnit, out unit))
+            {
+                unit.Logout(_playerUnit);
+            }
+        }
     }
 
     internal void ReceiveData(UnitBase _playerUnit, byte[] _bytes, long _tick)
@@ -101,13 +118,13 @@ internal class BattleManager
                 {
                     PackageData data = (PackageData)br.ReadInt16();
 
-                    ReceiveActionData(_playerUnit, data);
+                    ReceiveActionData(_playerUnit, data, _tick);
                 }
             }
         }
     }
 
-    private void ReceiveActionData(UnitBase _playerUnit, PackageData _data)
+    private void ReceiveActionData(UnitBase _playerUnit, PackageData _data, long _tick)
     {
         BattleUnit battleUnit;
 
@@ -143,7 +160,7 @@ internal class BattleManager
 
                     oCards = StaticData.GetData<TestCardsSDS>(2).cards;
 
-                    battleUnit.Init(_playerUnit, tmpPlayer, mCards, oCards, mapID, false);
+                    battleUnit.Init(_playerUnit, tmpPlayer, mCards, oCards, mapID, false, _tick);
 
                     ReplyClient(_playerUnit, false, PlayerState.BATTLE);
 
@@ -164,7 +181,7 @@ internal class BattleManager
 
                 oCards = StaticData.GetData<TestCardsSDS>(2).cards;
 
-                battleUnit.Init(_playerUnit, null, mCards, oCards, mapID, true);
+                battleUnit.Init(_playerUnit, null, mCards, oCards, mapID, true, _tick);
 
                 ReplyClient(_playerUnit, false, PlayerState.BATTLE);
 
