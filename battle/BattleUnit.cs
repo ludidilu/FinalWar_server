@@ -5,7 +5,7 @@ using Connection;
 
 internal class BattleUnit
 {
-    private const long MAX_TICK = 3000;
+    private const long MAX_TICK = 1200;
 
     private UnitBase mPlayer;
     private UnitBase oPlayer;

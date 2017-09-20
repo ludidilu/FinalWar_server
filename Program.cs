@@ -9,6 +9,8 @@ namespace FinalWar_server
 {
     class Program
     {
+        private const int tickTime = 50;
+
         static void Main(string[] args)
         {
             Connection.Log.Init(Console.WriteLine);
@@ -19,7 +21,7 @@ namespace FinalWar_server
 
             Server<PlayerUnit> server = new Server<PlayerUnit>();
 
-            server.Start("0.0.0.0", ConfigDictionary.Instance.port, 100);
+            server.Start("0.0.0.0", ConfigDictionary.Instance.port, 100, 12000);
 
             while (true)
             {
@@ -27,7 +29,7 @@ namespace FinalWar_server
 
                 BattleManager.Instance.Update(tick);
 
-                Thread.Sleep(10);
+                Thread.Sleep(tickTime);
             }
         }
 
