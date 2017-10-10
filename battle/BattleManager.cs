@@ -266,7 +266,7 @@ internal class BattleManager
 
     internal void Update(long _tick)
     {
-        Dictionary<BattleUnit, List<UnitBase>>.KeyCollection.Enumerator enumerator = battleList.Keys.GetEnumerator();
+        IEnumerator<BattleUnit> enumerator = battleList.Keys.GetEnumerator();
 
         while (enumerator.MoveNext())
         {

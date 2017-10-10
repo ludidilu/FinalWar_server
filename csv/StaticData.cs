@@ -76,7 +76,7 @@ public class StaticData
 
             List<T> list = new List<T>();
 
-            Dictionary<int, T>.ValueCollection.Enumerator enumerator = dict.Values.GetEnumerator();
+            IEnumerator<T> enumerator = dict.Values.GetEnumerator();
 
             while (enumerator.MoveNext())
             {
