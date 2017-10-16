@@ -65,15 +65,11 @@ namespace FinalWar_server
 
             Dictionary<int, EffectSDS> effectDic = StaticData.GetDic<EffectSDS>();
 
-            StaticData.Load<SkillSDS>("skill");
-
-            Dictionary<int, SkillSDS> skillDic = StaticData.GetDic<SkillSDS>();
-
             StaticData.Load<AuraSDS>("aura");
 
             Dictionary<int, AuraSDS> auraDic = StaticData.GetDic<AuraSDS>();
 
-            Battle.Init(mapDic, heroDic, skillDic, auraDic, effectDic);
+            Battle.Init(mapDic, heroDic, auraDic, effectDic);
 
             MapSDS.Load(null);
 
