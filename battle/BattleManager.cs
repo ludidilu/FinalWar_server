@@ -36,7 +36,7 @@ internal class BattleManager
 
     private const int mapID = 2;
 
-    private const bool isBattle = false;
+    private const bool isBattle = true;
 
     private Queue<BattleUnit> battleUnitPool1 = new Queue<BattleUnit>();
 
@@ -116,9 +116,16 @@ internal class BattleManager
                 }
                 else
                 {
-                    PackageData data = (PackageData)br.ReadInt16();
+                    if (battleListWithPlayer.ContainsKey(_playerUnit))
+                    {
+                        ReplyClient(_playerUnit, false, PlayerState.BATTLE);
+                    }
+                    else
+                    {
+                        PackageData data = (PackageData)br.ReadInt16();
 
-                    ReceiveActionData(_playerUnit, data, _tick);
+                        ReceiveActionData(_playerUnit, data, _tick);
+                    }
                 }
             }
         }
@@ -140,6 +147,10 @@ internal class BattleManager
                 {
                     lastPlayer = _playerUnit;
 
+                    ReplyClient(_playerUnit, false, PlayerState.SEARCHING);
+                }
+                else if (lastPlayer == _playerUnit)
+                {
                     ReplyClient(_playerUnit, false, PlayerState.SEARCHING);
                 }
                 else
@@ -170,6 +181,11 @@ internal class BattleManager
                 break;
 
             case PackageData.PVE:
+
+                if (lastPlayer == _playerUnit)
+                {
+                    lastPlayer = null;
+                }
 
                 battleUnit = GetBattleUnit(isBattle);
 
