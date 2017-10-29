@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
 using System.IO;
+using FinalWar;
 #if USE_ASSETBUNDLE
 using System.Threading;
 using wwwManager;
@@ -37,7 +38,7 @@ public class MapSDS : CsvBase, IMapSDS
 
         Dictionary<int, MapSDS> dic = StaticData.GetDic<MapSDS>();
 
-        IEnumerator<MapSDS> enumerator = dic.Values.GetEnumerator();
+        Dictionary<int, MapSDS>.ValueCollection.Enumerator enumerator = dic.Values.GetEnumerator();
 
 #if USE_ASSETBUNDLE
 

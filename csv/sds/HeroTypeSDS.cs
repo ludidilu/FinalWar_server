@@ -1,4 +1,6 @@
-﻿public partial class HeroTypeSDS : CsvBase, IHeroTypeSDS
+﻿using FinalWar;
+
+public partial class HeroTypeSDS : CsvBase, IHeroTypeSDS
 {
     public int attackSpeed;
     public int defenseSpeed;
@@ -6,7 +8,6 @@
 
     public int attackTimes;
     public int thread;
-    public int supportSpeedBonus;
     public int fearValue;
 
     public int fearType;
@@ -42,11 +43,6 @@
     public int GetThread()
     {
         return thread;
-    }
-
-    public int GetSupportSpeedBonus()
-    {
-        return supportSpeedBonus;
     }
 
     public int GetFearValue()

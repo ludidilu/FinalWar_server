@@ -37,14 +37,6 @@ namespace FinalWar_server
         {
             ConfigDictionary.Instance.LoadLocalConfig("local.xml");
 
-            using (FileStream fs = new FileStream(Path.Combine(ConfigDictionary.Instance.random_path, "random.dat"), FileMode.Open))
-            {
-                using (BinaryReader br = new BinaryReader(fs))
-                {
-                    BattleRandomPool.Load(br);
-                }
-            }
-
             StaticData.path = ConfigDictionary.Instance.table_path;
 
             StaticData.Load<MapSDS>("map");
