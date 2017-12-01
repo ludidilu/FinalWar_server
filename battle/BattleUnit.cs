@@ -44,7 +44,7 @@ internal class BattleUnit
     {
         bool isMine = _playerUnit == mPlayer;
 
-        bool b = battle.ServerGetPackage(_br, isMine, true);
+        bool b = battle.ServerGetPackage(_br, isMine);
 
         if (mPlayer != null)
         {
@@ -96,74 +96,19 @@ internal class BattleUnit
 
     internal void Logout(UnitBase _playerUnit)
     {
-        using (MemoryStream ms = new MemoryStream())
-        {
-            using (BinaryWriter bw = new BinaryWriter(ms))
-            {
-                bw.Write(PackageTag.C2S_QUIT);
-
-                ms.Position = 0;
-
-                using (BinaryReader br = new BinaryReader(ms))
-                {
-                    battle.ServerGetPackage(br, _playerUnit == mPlayer, false);
-                }
-            }
-        }
+        battle.ServerQuitBattleReal(_playerUnit == mPlayer);
     }
 
     internal void Update(long _tick)
     {
         if (_tick - mTick > MAX_TICK)
         {
-            using (MemoryStream ms = new MemoryStream())
-            {
-                using (BinaryWriter bw = new BinaryWriter(ms))
-                {
-                    mTick = _tick;
-
-                    bw.Write(PackageTag.C2S_DOACTION);
-
-                    bw.Write(battle.roundNum);
-
-                    bw.Write(0);
-
-                    bw.Write(0);
-
-                    ms.Position = 0;
-
-                    using (BinaryReader br = new BinaryReader(ms))
-                    {
-                        battle.ServerGetPackage(br, true, false);
-                    }
-                }
-            }
+            battle.ServerDoActionReal(true);
         }
 
         if (!isVsAi && (_tick - oTick > MAX_TICK))
         {
-            using (MemoryStream ms = new MemoryStream())
-            {
-                using (BinaryWriter bw = new BinaryWriter(ms))
-                {
-                    oTick = _tick;
-
-                    bw.Write(PackageTag.C2S_DOACTION);
-
-                    bw.Write(battle.roundNum);
-
-                    bw.Write(0);
-
-                    bw.Write(0);
-
-                    ms.Position = 0;
-
-                    using (BinaryReader br = new BinaryReader(ms))
-                    {
-                        battle.ServerGetPackage(br, false, false);
-                    }
-                }
-            }
+            battle.ServerDoActionReal(false);
         }
     }
 }
