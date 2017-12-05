@@ -28,7 +28,7 @@ internal class BattleUnit
         battle.ServerSetCallBack(SendData, BattleOver);
     }
 
-    internal void Init(UnitBase _mPlayer, UnitBase _oPlayer, IList<int> _mCards, IList<int> _oCards, int _mapID, bool _isVsAi, long _tick)
+    internal void Init(UnitBase _mPlayer, UnitBase _oPlayer, IList<int> _mCards, IList<int> _oCards, int _mapID, int _maxRoundNum, bool _isVsAi, long _tick)
     {
         mPlayer = _mPlayer;
         oPlayer = _oPlayer;
@@ -37,7 +37,7 @@ internal class BattleUnit
 
         isVsAi = _isVsAi;
 
-        battle.ServerStart(_mapID, _mCards, _oCards, isVsAi);
+        battle.ServerStart(_mapID, _maxRoundNum, _mCards, _oCards, isVsAi);
     }
 
     internal void ReceiveData(UnitBase _playerUnit, BinaryReader _br, long _tick)

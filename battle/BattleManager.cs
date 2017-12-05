@@ -34,7 +34,7 @@ internal class BattleManager
         }
     }
 
-    private const int mapID = 2;
+    private const int testID = 1;
 
     private const bool isBattle = true;
 
@@ -135,9 +135,7 @@ internal class BattleManager
     {
         BattleUnit battleUnit;
 
-        IList<int> mCards;
-
-        IList<int> oCards;
+        TestCardsSDS testCardSDS;
 
         switch (_data)
         {
@@ -167,11 +165,9 @@ internal class BattleManager
 
                     battleList.Add(battleUnit, new List<UnitBase>() { _playerUnit, tmpPlayer });
 
-                    mCards = StaticData.GetData<TestCardsSDS>(1).cards;
+                    testCardSDS = StaticData.GetData<TestCardsSDS>(testID);
 
-                    oCards = StaticData.GetData<TestCardsSDS>(2).cards;
-
-                    battleUnit.Init(_playerUnit, tmpPlayer, mCards, oCards, mapID, false, _tick);
+                    battleUnit.Init(_playerUnit, tmpPlayer, testCardSDS.mCards, testCardSDS.oCards, testCardSDS.mapID, testCardSDS.maxRoundNum, false, _tick);
 
                     ReplyClient(_playerUnit, false, PlayerState.BATTLE);
 
@@ -193,11 +189,9 @@ internal class BattleManager
 
                 battleList.Add(battleUnit, new List<UnitBase>() { _playerUnit });
 
-                mCards = StaticData.GetData<TestCardsSDS>(1).cards;
+                testCardSDS = StaticData.GetData<TestCardsSDS>(testID);
 
-                oCards = StaticData.GetData<TestCardsSDS>(2).cards;
-
-                battleUnit.Init(_playerUnit, null, mCards, oCards, mapID, true, _tick);
+                battleUnit.Init(_playerUnit, null, testCardSDS.mCards, testCardSDS.oCards, testCardSDS.mapID, testCardSDS.maxRoundNum, true, _tick);
 
                 ReplyClient(_playerUnit, false, PlayerState.BATTLE);
 
