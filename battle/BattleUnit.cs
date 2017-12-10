@@ -89,9 +89,12 @@ internal class BattleUnit
 
     private void BattleOver(Battle.BattleResult _result)
     {
-        mPlayer = oPlayer = null;
+        if (_result != Battle.BattleResult.NOT_OVER)
+        {
+            mPlayer = oPlayer = null;
 
-        BattleManager.Instance.BattleOver(this);
+            BattleManager.Instance.BattleOver(this);
+        }
     }
 
     internal void Logout(UnitBase _playerUnit)
