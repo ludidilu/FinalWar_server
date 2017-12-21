@@ -17,15 +17,15 @@ internal class BattleUnit
 
     private bool isVsAi;
 
-    internal bool isBattle { private set; get; }
+    internal bool processBattle { private set; get; }
 
-    internal BattleUnit(bool _isBattle)
+    internal BattleUnit(bool _processBattle)
     {
-        isBattle = _isBattle;
+        processBattle = _processBattle;
 
-        battle = new Battle_server(isBattle);
+        battle = new Battle_server(processBattle);
 
-        battle.ServerSetCallBack(SendData, BattleOver);
+        battle.ServerSetCallBack(SendData, BattleRoundOver);
     }
 
     internal void Init(UnitBase _mPlayer, UnitBase _oPlayer, IList<int> _mCards, IList<int> _oCards, int _mapID, int _maxRoundNum, bool _isVsAi, long _tick)
@@ -87,13 +87,17 @@ internal class BattleUnit
         }
     }
 
-    private void BattleOver(Battle.BattleResult _result)
+    private void BattleRoundOver(Battle.BattleResult _result)
     {
         if (_result != Battle.BattleResult.NOT_OVER)
         {
+            UnitBase m = mPlayer;
+
+            UnitBase o = oPlayer;
+
             mPlayer = oPlayer = null;
 
-            BattleManager.Instance.BattleOver(this);
+            BattleManager.Instance.BattleOver(this, m, o);
         }
     }
 
@@ -102,16 +106,34 @@ internal class BattleUnit
         battle.ServerQuitBattleReal(_playerUnit == mPlayer);
     }
 
-    internal void Update(long _tick)
+    internal bool CheckDoAutoAction(long _tick, UnitBase _player)
     {
-        if (_tick - mTick > MAX_TICK)
+        if (_player == mPlayer)
         {
-            battle.ServerDoActionReal(true);
+            if (_tick - mTick > MAX_TICK)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
+        else
+        {
+            if (_tick - oTick > MAX_TICK)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
 
-        if (!isVsAi && (_tick - oTick > MAX_TICK))
-        {
-            battle.ServerDoActionReal(false);
-        }
+    internal void DoAutoAction(UnitBase _player)
+    {
+        battle.ServerDoActionReal(_player == mPlayer);
     }
 }

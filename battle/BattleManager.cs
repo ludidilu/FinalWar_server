@@ -34,17 +34,17 @@ internal class BattleManager
         }
     }
 
-    private const int testID = 1;
+    private const int testID = 2;
 
-    private const bool isBattle = true;
+    private const bool processBattle = true;
 
     private Queue<BattleUnit> battleUnitPool1 = new Queue<BattleUnit>();
 
     private Queue<BattleUnit> battleUnitPool2 = new Queue<BattleUnit>();
 
-    private Dictionary<BattleUnit, List<UnitBase>> battleList = new Dictionary<BattleUnit, List<UnitBase>>();
+    private Dictionary<UnitBase, BattleUnit> battleDic = new Dictionary<UnitBase, BattleUnit>();
 
-    private Dictionary<UnitBase, BattleUnit> battleListWithPlayer = new Dictionary<UnitBase, BattleUnit>();
+    private Dictionary<UnitBase, BattleUnit> tmpDic = new Dictionary<UnitBase, BattleUnit>();
 
     private UnitBase lastPlayer = null;
 
@@ -58,7 +58,7 @@ internal class BattleManager
         }
         else
         {
-            if (battleListWithPlayer.ContainsKey(_playerUnit))
+            if (battleDic.ContainsKey(_playerUnit))
             {
                 playerState = PlayerState.BATTLE;
             }
@@ -81,7 +81,7 @@ internal class BattleManager
         {
             BattleUnit unit;
 
-            if (battleListWithPlayer.TryGetValue(_playerUnit, out unit))
+            if (battleDic.TryGetValue(_playerUnit, out unit))
             {
                 unit.Logout(_playerUnit);
             }
@@ -98,9 +98,9 @@ internal class BattleManager
 
                 if (isBattle)
                 {
-                    if (battleListWithPlayer.ContainsKey(_playerUnit))
+                    if (battleDic.ContainsKey(_playerUnit))
                     {
-                        battleListWithPlayer[_playerUnit].ReceiveData(_playerUnit, br, _tick);
+                        battleDic[_playerUnit].ReceiveData(_playerUnit, br, _tick);
                     }
                     else
                     {
@@ -116,7 +116,7 @@ internal class BattleManager
                 }
                 else
                 {
-                    if (battleListWithPlayer.ContainsKey(_playerUnit))
+                    if (battleDic.ContainsKey(_playerUnit))
                     {
                         ReplyClient(_playerUnit, false, PlayerState.BATTLE);
                     }
@@ -153,17 +153,15 @@ internal class BattleManager
                 }
                 else
                 {
-                    battleUnit = GetBattleUnit(isBattle);
+                    battleUnit = GetBattleUnit(processBattle);
 
                     UnitBase tmpPlayer = lastPlayer;
 
                     lastPlayer = null;
 
-                    battleListWithPlayer.Add(_playerUnit, battleUnit);
+                    battleDic.Add(_playerUnit, battleUnit);
 
-                    battleListWithPlayer.Add(tmpPlayer, battleUnit);
-
-                    battleList.Add(battleUnit, new List<UnitBase>() { _playerUnit, tmpPlayer });
+                    battleDic.Add(tmpPlayer, battleUnit);
 
                     testCardSDS = StaticData.GetData<TestCardsSDS>(testID);
 
@@ -183,11 +181,9 @@ internal class BattleManager
                     lastPlayer = null;
                 }
 
-                battleUnit = GetBattleUnit(isBattle);
+                battleUnit = GetBattleUnit(processBattle);
 
-                battleListWithPlayer.Add(_playerUnit, battleUnit);
-
-                battleList.Add(battleUnit, new List<UnitBase>() { _playerUnit });
+                battleDic.Add(_playerUnit, battleUnit);
 
                 testCardSDS = StaticData.GetData<TestCardsSDS>(testID);
 
@@ -228,35 +224,33 @@ internal class BattleManager
         }
     }
 
-    internal void BattleOver(BattleUnit _battleUnit)
+    internal void BattleOver(BattleUnit _battleUnit, UnitBase _mPlayer, UnitBase _oPlayer)
     {
-        List<UnitBase> tmpList = battleList[_battleUnit];
+        battleDic.Remove(_mPlayer);
 
-        for (int i = 0; i < tmpList.Count; i++)
+        if (_oPlayer != null)
         {
-            battleListWithPlayer.Remove(tmpList[i]);
+            battleDic.Remove(_oPlayer);
         }
-
-        battleList.Remove(_battleUnit);
 
         ReleaseBattleUnit(_battleUnit);
     }
 
-    private BattleUnit GetBattleUnit(bool _isBattle)
+    private BattleUnit GetBattleUnit(bool _processBattle)
     {
         BattleUnit battleUnit;
 
-        if (_isBattle && battleUnitPool1.Count > 0)
+        if (_processBattle && battleUnitPool1.Count > 0)
         {
             battleUnit = battleUnitPool1.Dequeue();
         }
-        else if (!_isBattle && battleUnitPool2.Count > 0)
+        else if (!_processBattle && battleUnitPool2.Count > 0)
         {
             battleUnit = battleUnitPool2.Dequeue();
         }
         else
         {
-            battleUnit = new BattleUnit(_isBattle);
+            battleUnit = new BattleUnit(_processBattle);
         }
 
         return battleUnit;
@@ -264,7 +258,7 @@ internal class BattleManager
 
     private void ReleaseBattleUnit(BattleUnit _battleUnit)
     {
-        if (_battleUnit.isBattle)
+        if (_battleUnit.processBattle)
         {
             battleUnitPool1.Enqueue(_battleUnit);
         }
@@ -276,11 +270,30 @@ internal class BattleManager
 
     internal void Update(long _tick)
     {
-        IEnumerator<BattleUnit> enumerator = battleList.Keys.GetEnumerator();
+        IEnumerator<KeyValuePair<UnitBase, BattleUnit>> enumerator = battleDic.GetEnumerator();
 
         while (enumerator.MoveNext())
         {
-            enumerator.Current.Update(_tick);
+            KeyValuePair<UnitBase, BattleUnit> pair = enumerator.Current;
+
+            if (pair.Value.CheckDoAutoAction(_tick, pair.Key))
+            {
+                tmpDic.Add(pair.Key, pair.Value);
+            }
+        }
+
+        if (tmpDic.Count > 0)
+        {
+            enumerator = tmpDic.GetEnumerator();
+
+            while (enumerator.MoveNext())
+            {
+                KeyValuePair<UnitBase, BattleUnit> pair = enumerator.Current;
+
+                pair.Value.DoAutoAction(pair.Key);
+            }
+
+            tmpDic.Clear();
         }
     }
 }
