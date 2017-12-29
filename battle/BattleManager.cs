@@ -48,6 +48,8 @@ internal class BattleManager
 
     private UnitBase lastPlayer = null;
 
+    internal long tick { private set; get; }
+
     internal byte[] Login(UnitBase _playerUnit)
     {
         PlayerState playerState;
@@ -88,7 +90,7 @@ internal class BattleManager
         }
     }
 
-    internal void ReceiveData(UnitBase _playerUnit, byte[] _bytes, long _tick)
+    internal void ReceiveData(UnitBase _playerUnit, byte[] _bytes)
     {
         using (MemoryStream ms = new MemoryStream(_bytes))
         {
@@ -100,7 +102,7 @@ internal class BattleManager
                 {
                     if (battleDic.ContainsKey(_playerUnit))
                     {
-                        battleDic[_playerUnit].ReceiveData(_playerUnit, br, _tick);
+                        battleDic[_playerUnit].ReceiveData(_playerUnit, br);
                     }
                     else
                     {
@@ -124,14 +126,14 @@ internal class BattleManager
                     {
                         PackageData data = (PackageData)br.ReadInt16();
 
-                        ReceiveActionData(_playerUnit, data, _tick);
+                        ReceiveActionData(_playerUnit, data);
                     }
                 }
             }
         }
     }
 
-    private void ReceiveActionData(UnitBase _playerUnit, PackageData _data, long _tick)
+    private void ReceiveActionData(UnitBase _playerUnit, PackageData _data)
     {
         BattleUnit battleUnit;
 
@@ -165,7 +167,7 @@ internal class BattleManager
 
                     testCardSDS = StaticData.GetData<TestCardsSDS>(testID);
 
-                    battleUnit.Init(_playerUnit, tmpPlayer, testCardSDS.mCards, testCardSDS.oCards, testCardSDS.mapID, testCardSDS.maxRoundNum, false, _tick);
+                    battleUnit.Init(_playerUnit, tmpPlayer, testCardSDS.mCards, testCardSDS.oCards, testCardSDS.mapID, testCardSDS.maxRoundNum, false);
 
                     ReplyClient(_playerUnit, false, PlayerState.BATTLE);
 
@@ -187,7 +189,7 @@ internal class BattleManager
 
                 testCardSDS = StaticData.GetData<TestCardsSDS>(testID);
 
-                battleUnit.Init(_playerUnit, null, testCardSDS.mCards, testCardSDS.oCards, testCardSDS.mapID, testCardSDS.maxRoundNum, true, _tick);
+                battleUnit.Init(_playerUnit, null, testCardSDS.mCards, testCardSDS.oCards, testCardSDS.mapID, testCardSDS.maxRoundNum, true);
 
                 ReplyClient(_playerUnit, false, PlayerState.BATTLE);
 
@@ -270,13 +272,15 @@ internal class BattleManager
 
     internal void Update(long _tick)
     {
+        tick = _tick;
+
         IEnumerator<KeyValuePair<UnitBase, BattleUnit>> enumerator = battleDic.GetEnumerator();
 
         while (enumerator.MoveNext())
         {
             KeyValuePair<UnitBase, BattleUnit> pair = enumerator.Current;
 
-            if (pair.Value.CheckDoAutoAction(_tick, pair.Key))
+            if (pair.Value.CheckDoAutoAction(pair.Key))
             {
                 tmpDic.Add(pair.Key, pair.Value);
             }

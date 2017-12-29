@@ -28,19 +28,19 @@ internal class BattleUnit
         battle.ServerSetCallBack(SendData, BattleRoundOver);
     }
 
-    internal void Init(UnitBase _mPlayer, UnitBase _oPlayer, IList<int> _mCards, IList<int> _oCards, int _mapID, int _maxRoundNum, bool _isVsAi, long _tick)
+    internal void Init(UnitBase _mPlayer, UnitBase _oPlayer, IList<int> _mCards, IList<int> _oCards, int _mapID, int _maxRoundNum, bool _isVsAi)
     {
         mPlayer = _mPlayer;
         oPlayer = _oPlayer;
 
-        mTick = oTick = _tick;
+        mTick = oTick = BattleManager.Instance.tick;
 
         isVsAi = _isVsAi;
 
         battle.ServerStart(_mapID, _maxRoundNum, _mCards, _oCards, isVsAi);
     }
 
-    internal void ReceiveData(UnitBase _playerUnit, BinaryReader _br, long _tick)
+    internal void ReceiveData(UnitBase _playerUnit, BinaryReader _br)
     {
         bool isMine = _playerUnit == mPlayer;
 
@@ -52,11 +52,11 @@ internal class BattleUnit
             {
                 if (isMine)
                 {
-                    mTick = _tick;
+                    mTick = BattleManager.Instance.tick;
                 }
                 else
                 {
-                    oTick = _tick;
+                    oTick = BattleManager.Instance.tick;
                 }
             }
         }
@@ -89,6 +89,8 @@ internal class BattleUnit
 
     private void BattleRoundOver(Battle.BattleResult _result)
     {
+        mTick = oTick = BattleManager.Instance.tick;
+
         if (_result != Battle.BattleResult.NOT_OVER)
         {
             UnitBase m = mPlayer;
@@ -106,11 +108,11 @@ internal class BattleUnit
         battle.ServerQuitBattleReal(_playerUnit == mPlayer);
     }
 
-    internal bool CheckDoAutoAction(long _tick, UnitBase _player)
+    internal bool CheckDoAutoAction(UnitBase _player)
     {
         if (_player == mPlayer)
         {
-            if (_tick - mTick > MAX_TICK)
+            if (BattleManager.Instance.tick - mTick > MAX_TICK)
             {
                 return true;
             }
@@ -121,7 +123,7 @@ internal class BattleUnit
         }
         else
         {
-            if (_tick - oTick > MAX_TICK)
+            if (BattleManager.Instance.tick - oTick > MAX_TICK)
             {
                 return true;
             }

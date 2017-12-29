@@ -2,7 +2,7 @@
 
 internal class PlayerUnit : UnitBase
 {
-    public override byte[] Login(long _tick)
+    public override byte[] Login()
     {
         return BattleManager.Instance.Login(this);
     }
@@ -17,8 +17,8 @@ internal class PlayerUnit : UnitBase
         }
     }
 
-    public override void ReceiveData(byte[] _bytes, long _tick)
+    public override void ReceiveData(byte[] _bytes)
     {
-        BattleManager.Instance.ReceiveData(this, _bytes, _tick);
+        BattleManager.Instance.ReceiveData(this, _bytes);
     }
 }
