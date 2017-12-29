@@ -165,7 +165,7 @@ internal class BattleManager
 
                     testCardSDS = StaticData.GetData<TestCardsSDS>(testID);
 
-                    battleUnit.Init(_playerUnit, tmpPlayer, testCardSDS.mCards, testCardSDS.oCards, testCardSDS.mapID, testCardSDS.maxRoundNum, false, _tick);
+                    battleUnit.Init(_playerUnit, tmpPlayer, testCardSDS.mCards, testCardSDS.oCards, testCardSDS.mapID, testCardSDS.maxRoundNum, testCardSDS.randomSeed, false, _tick);
 
                     ReplyClient(_playerUnit, false, PlayerState.BATTLE);
 
@@ -187,7 +187,7 @@ internal class BattleManager
 
                 testCardSDS = StaticData.GetData<TestCardsSDS>(testID);
 
-                battleUnit.Init(_playerUnit, null, testCardSDS.mCards, testCardSDS.oCards, testCardSDS.mapID, testCardSDS.maxRoundNum, true, _tick);
+                battleUnit.Init(_playerUnit, null, testCardSDS.mCards, testCardSDS.oCards, testCardSDS.mapID, testCardSDS.maxRoundNum, testCardSDS.randomSeed, true, _tick);
 
                 ReplyClient(_playerUnit, false, PlayerState.BATTLE);
 
