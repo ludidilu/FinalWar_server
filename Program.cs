@@ -41,7 +41,7 @@ namespace FinalWar_server
 
             StaticData.Load<MapSDS>("map");
 
-            StaticData.Load<TestCardsSDS>("testCards");
+            StaticData.Load<BattleSDS>("battle");
 
             StaticData.Load<HeroTypeSDS>("heroType");
 

@@ -34,7 +34,7 @@ internal class BattleManager
         }
     }
 
-    private const int testID = 2;
+    private const int PVP_BATTLE_ID = 2;
 
     private const bool processBattle = true;
 
@@ -124,22 +124,22 @@ internal class BattleManager
                     }
                     else
                     {
-                        PackageData data = (PackageData)br.ReadInt16();
-
-                        ReceiveActionData(_playerUnit, data);
+                        ReceiveActionData(_playerUnit, br);
                     }
                 }
             }
         }
     }
 
-    private void ReceiveActionData(UnitBase _playerUnit, PackageData _data)
+    private void ReceiveActionData(UnitBase _playerUnit, BinaryReader _br)
     {
+        PackageData data = (PackageData)_br.ReadInt16();
+
         BattleUnit battleUnit;
 
-        TestCardsSDS testCardSDS;
+        BattleSDS battleSDS;
 
-        switch (_data)
+        switch (data)
         {
             case PackageData.PVP:
 
@@ -165,9 +165,9 @@ internal class BattleManager
 
                     battleDic.Add(tmpPlayer, battleUnit);
 
-                    testCardSDS = StaticData.GetData<TestCardsSDS>(testID);
+                    battleSDS = StaticData.GetData<BattleSDS>(PVP_BATTLE_ID);
 
-                    battleUnit.Init(_playerUnit, tmpPlayer, testCardSDS.mCards, testCardSDS.oCards, testCardSDS.mapID, testCardSDS.maxRoundNum, false);
+                    battleUnit.Init(_playerUnit, tmpPlayer, battleSDS.mCards, battleSDS.oCards, battleSDS.mapID, battleSDS.maxRoundNum, false);
 
                     ReplyClient(_playerUnit, false, PlayerState.BATTLE);
 
@@ -183,13 +183,15 @@ internal class BattleManager
                     lastPlayer = null;
                 }
 
+                int battleID = _br.ReadInt32();
+
                 battleUnit = GetBattleUnit(processBattle);
 
                 battleDic.Add(_playerUnit, battleUnit);
 
-                testCardSDS = StaticData.GetData<TestCardsSDS>(testID);
+                battleSDS = StaticData.GetData<BattleSDS>(battleID);
 
-                battleUnit.Init(_playerUnit, null, testCardSDS.mCards, testCardSDS.oCards, testCardSDS.mapID, testCardSDS.maxRoundNum, true);
+                battleUnit.Init(_playerUnit, null, battleSDS.mCards, battleSDS.oCards, battleSDS.mapID, battleSDS.maxRoundNum, true);
 
                 ReplyClient(_playerUnit, false, PlayerState.BATTLE);
 
