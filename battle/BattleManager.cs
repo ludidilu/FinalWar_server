@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Connection;
 using System;
 
 internal class BattleManager

@@ -1,7 +1,6 @@
 ﻿using FinalWar;
 using System.IO;
 using System.Collections.Generic;
-using Connection;
 
 internal class BattleUnit
 {
