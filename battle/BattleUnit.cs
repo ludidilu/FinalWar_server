@@ -7,8 +7,8 @@ internal class BattleUnit
 {
     private const long MAX_TICK = 1200;
 
-    private UnitBase mPlayer;
-    private UnitBase oPlayer;
+    private PlayerUnit mPlayer;
+    private PlayerUnit oPlayer;
 
     private long mTick;
     private long oTick;
@@ -28,7 +28,7 @@ internal class BattleUnit
         battle.ServerSetCallBack(SendData, BattleRoundOver);
     }
 
-    internal void Init(UnitBase _mPlayer, UnitBase _oPlayer, IList<int> _mCards, IList<int> _oCards, int _mapID, int _maxRoundNum, bool _isVsAi)
+    internal void Init(PlayerUnit _mPlayer, PlayerUnit _oPlayer, IList<int> _mCards, IList<int> _oCards, int _mapID, int _maxRoundNum, bool _isVsAi)
     {
         mPlayer = _mPlayer;
         oPlayer = _oPlayer;
@@ -40,7 +40,7 @@ internal class BattleUnit
         battle.ServerStart(_mapID, _maxRoundNum, _mCards, _oCards, isVsAi);
     }
 
-    internal void ReceiveData(UnitBase _playerUnit, BinaryReader _br)
+    internal void ReceiveData(PlayerUnit _playerUnit, BinaryReader _br)
     {
         bool isMine = _playerUnit == mPlayer;
 
@@ -93,9 +93,9 @@ internal class BattleUnit
 
         if (_result != Battle.BattleResult.NOT_OVER)
         {
-            UnitBase m = mPlayer;
+            PlayerUnit m = mPlayer;
 
-            UnitBase o = oPlayer;
+            PlayerUnit o = oPlayer;
 
             mPlayer = oPlayer = null;
 
@@ -103,12 +103,12 @@ internal class BattleUnit
         }
     }
 
-    internal void Logout(UnitBase _playerUnit)
+    internal void Logout(PlayerUnit _playerUnit)
     {
         battle.ServerQuitBattleReal(_playerUnit == mPlayer);
     }
 
-    internal bool CheckDoAutoAction(UnitBase _player)
+    internal bool CheckDoAutoAction(PlayerUnit _player)
     {
         if (_player == mPlayer)
         {
@@ -134,7 +134,7 @@ internal class BattleUnit
         }
     }
 
-    internal void DoAutoAction(UnitBase _player)
+    internal void DoAutoAction(PlayerUnit _player)
     {
         battle.ServerDoActionReal(_player == mPlayer);
     }
