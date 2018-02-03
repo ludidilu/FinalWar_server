@@ -65,13 +65,10 @@ public class StaticData
 
         if (dicList.ContainsKey(type))
         {
-
             return dicList[type] as List<T>;
-
         }
         else
         {
-
             Dictionary<int, T> dict = GetDic<T>();
 
             List<T> list = new List<T>();
@@ -92,7 +89,6 @@ public class StaticData
 
     public static bool IsIDExists<T>(int _id) where T : CsvBase
     {
-
         Dictionary<int, T> dict = GetDic<T>();
 
         return dict.ContainsKey(_id);
@@ -124,43 +120,46 @@ public class StaticData
 
                 FieldInfo[] infoArr = null;
 
-                while (lineStr != null)
+                while (!string.IsNullOrEmpty(lineStr))
                 {
-                    if (i == 2)
+                    if (!lineStr.StartsWith("//"))
                     {
-                        string[] dataArr = lineStr.Split(',');
-
-                        infoArr = new FieldInfo[dataArr.Length];
-
-                        for (int m = 1; m < dataArr.Length; m++)
+                        if (i == 2)
                         {
-                            infoArr[m] = type.GetField(dataArr[m]);
-                        }
-                    }
-                    else if (i > 2)
-                    {
-                        string[] dataArr = lineStr.Split(',');
+                            string[] dataArr = lineStr.Split(',');
 
-                        T csv = new T();
+                            infoArr = new FieldInfo[dataArr.Length];
 
-                        csv.ID = Int32.Parse(dataArr[0]);
-
-                        for (int m = 1; m < infoArr.Length; m++)
-                        {
-                            FieldInfo info = infoArr[m];
-
-                            if (info != null)
+                            for (int m = 1; m < dataArr.Length; m++)
                             {
-                                setData(info, csv, dataArr[m]);
+                                infoArr[m] = type.GetField(dataArr[m]);
                             }
                         }
+                        else if (i > 2)
+                        {
+                            string[] dataArr = lineStr.Split(',');
 
-                        csv.Fix();
+                            T csv = new T();
 
-                        result.Add(csv.ID, csv);
+                            csv.ID = int.Parse(dataArr[0]);
+
+                            for (int m = 1; m < infoArr.Length; m++)
+                            {
+                                FieldInfo info = infoArr[m];
+
+                                if (info != null)
+                                {
+                                    SetData(info, csv, dataArr[m]);
+                                }
+                            }
+
+                            csv.Fix();
+
+                            result.Add(csv.ID, csv);
+                        }
+
+                        i++;
                     }
-
-                    i++;
 
                     lineStr = reader.ReadLine();
                 }
@@ -168,15 +167,12 @@ public class StaticData
         }
 
         dic.Add(type, result);
-
-        //        SuperDebug.Log("StaticData.Load" + Application.dataPath + path + _name + ".csv" + "  complete!!!");
     }
 
-    private static void setData(FieldInfo _info, CsvBase _csv, string _data)
+    private static void SetData(FieldInfo _info, CsvBase _csv, string _data)
     {
         string str = "setData:" + _info.Name + "   " + _info.FieldType.Name + "   " + _data + "   " + _data.Length + Environment.NewLine;
 
-        //SuperDebug.Log(str);
         try
         {
             switch (_info.FieldType.Name)
