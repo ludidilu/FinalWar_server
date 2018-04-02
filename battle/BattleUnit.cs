@@ -6,8 +6,8 @@ internal class BattleUnit
 {
     private const long MAX_TICK = 1200;
 
-    private PlayerUnit mPlayer;
-    private PlayerUnit oPlayer;
+    private int mPlayer;
+    private int oPlayer;
 
     private long mTick;
     private long oTick;
@@ -27,7 +27,7 @@ internal class BattleUnit
         battle.ServerSetCallBack(SendData, BattleRoundOver);
     }
 
-    internal void Init(PlayerUnit _mPlayer, PlayerUnit _oPlayer, IList<int> _mCards, IList<int> _oCards, int _mapID, int _maxRoundNum, bool _isVsAi)
+    internal void Init(int _mPlayer, int _oPlayer, IList<int> _mCards, IList<int> _oCards, int _mapID, int _maxRoundNum, bool _isVsAi)
     {
         mPlayer = _mPlayer;
         oPlayer = _oPlayer;
@@ -39,24 +39,21 @@ internal class BattleUnit
         battle.ServerStart(_mapID, _maxRoundNum, _mCards, _oCards, isVsAi);
     }
 
-    internal void ReceiveData(PlayerUnit _playerUnit, BinaryReader _br)
+    internal void ReceiveData(int _uid, BinaryReader _br)
     {
-        bool isMine = _playerUnit == mPlayer;
+        bool isMine = _uid == mPlayer;
 
         bool b = battle.ServerGetPackage(_br, isMine);
 
-        if (mPlayer != null)
+        if (b)
         {
-            if (b)
+            if (isMine)
             {
-                if (isMine)
-                {
-                    mTick = BattleManager.Instance.tick;
-                }
-                else
-                {
-                    oTick = BattleManager.Instance.tick;
-                }
+                mTick = BattleManager.Instance.tick;
+            }
+            else
+            {
+                oTick = BattleManager.Instance.tick;
             }
         }
     }
@@ -74,13 +71,13 @@ internal class BattleUnit
 
                 bw.Write(_ms.GetBuffer(), 0, (int)_ms.Length);
 
-                if (_isMine)
+                if (_isMine && mPlayer != -1)
                 {
-                    mPlayer.SendData(_isPush, ms);
+                    BattleManager.Instance.SendData(mPlayer, _isPush, ms);
                 }
-                else if (oPlayer != null)
+                else if (!_isMine && oPlayer != -1)
                 {
-                    oPlayer.SendData(_isPush, ms);
+                    BattleManager.Instance.SendData(oPlayer, _isPush, ms);
                 }
             }
         }
@@ -92,22 +89,22 @@ internal class BattleUnit
 
         if (_result != Battle.BattleResult.NOT_OVER)
         {
-            PlayerUnit m = mPlayer;
+            int m = mPlayer;
 
-            PlayerUnit o = oPlayer;
+            int o = oPlayer;
 
-            mPlayer = oPlayer = null;
+            mPlayer = oPlayer = -1;
 
             BattleManager.Instance.BattleOver(this, m, o);
         }
     }
 
-    internal void Logout(PlayerUnit _playerUnit)
+    internal void Logout(int _uid)
     {
-        battle.ServerQuitBattleReal(_playerUnit == mPlayer);
+        battle.ServerQuitBattleReal(_uid == mPlayer);
     }
 
-    internal bool CheckDoAutoAction(PlayerUnit _player)
+    internal bool CheckDoAutoAction(int _player)
     {
         if (_player == mPlayer)
         {
@@ -133,8 +130,8 @@ internal class BattleUnit
         }
     }
 
-    internal void DoAutoAction(PlayerUnit _player)
+    internal void DoAutoAction(int _uid)
     {
-        battle.ServerDoActionReal(_player == mPlayer);
+        battle.ServerDoActionReal(_uid == mPlayer);
     }
 }

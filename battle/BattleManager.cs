@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System;
 
 internal class BattleManager
 {
@@ -18,20 +17,7 @@ internal class BattleManager
         CANCEL_SEARCH
     }
 
-    private static BattleManager _Instance;
-
-    internal static BattleManager Instance
-    {
-        get
-        {
-            if (_Instance == null)
-            {
-                _Instance = new BattleManager();
-            }
-
-            return _Instance;
-        }
-    }
+    public static BattleManager Instance;
 
     private const int PVP_BATTLE_ID = 2;
 
@@ -41,19 +27,17 @@ internal class BattleManager
 
     private Queue<BattleUnit> battleUnitPool2 = new Queue<BattleUnit>();
 
-    private Dictionary<PlayerUnit, BattleUnit> battleDic = new Dictionary<PlayerUnit, BattleUnit>();
+    private Dictionary<int, BattleUnit> battleDic = new Dictionary<int, BattleUnit>();
 
-    private Dictionary<PlayerUnit, BattleUnit> tmpDic = new Dictionary<PlayerUnit, BattleUnit>();
-
-    private PlayerUnit lastPlayer = null;
+    private int lastPlayer = -1;
 
     internal long tick { private set; get; }
 
-    internal byte[] Login(PlayerUnit _playerUnit)
+    internal void Login(int _playerUnit)
     {
         PlayerState playerState;
 
-        if (_playerUnit == lastPlayer)
+        if (lastPlayer == _playerUnit)
         {
             playerState = PlayerState.SEARCHING;
         }
@@ -69,27 +53,18 @@ internal class BattleManager
             }
         }
 
-        return BitConverter.GetBytes((short)playerState);
+        ReplyClient(_playerUnit, false, playerState);
     }
 
-    internal void Logout(PlayerUnit _playerUnit)
+    internal void Logout(int _playerUnit)
     {
         if (lastPlayer == _playerUnit)
         {
-            lastPlayer = null;
-        }
-        else
-        {
-            BattleUnit unit;
-
-            if (battleDic.TryGetValue(_playerUnit, out unit))
-            {
-                unit.Logout(_playerUnit);
-            }
+            lastPlayer = -1;
         }
     }
 
-    internal void ReceiveData(PlayerUnit _playerUnit, byte[] _bytes)
+    internal void ReceiveData(int _playerUnit, byte[] _bytes)
     {
         using (MemoryStream ms = new MemoryStream(_bytes))
         {
@@ -99,9 +74,11 @@ internal class BattleManager
 
                 if (isBattle)
                 {
-                    if (battleDic.ContainsKey(_playerUnit))
+                    BattleUnit battleUnit;
+
+                    if (battleDic.TryGetValue(_playerUnit, out battleUnit))
                     {
-                        battleDic[_playerUnit].ReceiveData(_playerUnit, br);
+                        battleUnit.ReceiveData(_playerUnit, br);
                     }
                     else
                     {
@@ -130,7 +107,7 @@ internal class BattleManager
         }
     }
 
-    private void ReceiveActionData(PlayerUnit _playerUnit, BinaryReader _br)
+    private void ReceiveActionData(int _playerUnit, BinaryReader _br)
     {
         PackageData data = (PackageData)_br.ReadInt16();
 
@@ -142,7 +119,7 @@ internal class BattleManager
         {
             case PackageData.PVP:
 
-                if (lastPlayer == null)
+                if (lastPlayer == -1)
                 {
                     lastPlayer = _playerUnit;
 
@@ -156,9 +133,9 @@ internal class BattleManager
                 {
                     battleUnit = GetBattleUnit(processBattle);
 
-                    PlayerUnit tmpPlayer = lastPlayer;
+                    int tmpPlayer = lastPlayer;
 
-                    lastPlayer = null;
+                    lastPlayer = -1;
 
                     battleDic.Add(_playerUnit, battleUnit);
 
@@ -179,7 +156,7 @@ internal class BattleManager
 
                 if (lastPlayer == _playerUnit)
                 {
-                    lastPlayer = null;
+                    lastPlayer = -1;
                 }
 
                 int battleID = _br.ReadInt32();
@@ -190,7 +167,7 @@ internal class BattleManager
 
                 battleSDS = StaticData.GetData<BattleSDS>(battleID);
 
-                battleUnit.Init(_playerUnit, null, battleSDS.mCards, battleSDS.oCards, battleSDS.mapID, battleSDS.maxRoundNum, true);
+                battleUnit.Init(_playerUnit, -1, battleSDS.mCards, battleSDS.oCards, battleSDS.mapID, battleSDS.maxRoundNum, true);
 
                 ReplyClient(_playerUnit, false, PlayerState.BATTLE);
 
@@ -200,7 +177,7 @@ internal class BattleManager
 
                 if (lastPlayer == _playerUnit)
                 {
-                    lastPlayer = null;
+                    lastPlayer = -1;
                 }
 
                 ReplyClient(_playerUnit, false, PlayerState.FREE);
@@ -209,7 +186,7 @@ internal class BattleManager
         }
     }
 
-    private void ReplyClient(PlayerUnit _playerUnit, bool _isPush, PlayerState _playerState)
+    private void ReplyClient(int _uid, bool _isPush, PlayerState _playerState)
     {
         using (MemoryStream ms = new MemoryStream())
         {
@@ -222,16 +199,19 @@ internal class BattleManager
 
                 bw.Write((short)_playerState);
 
-                _playerUnit.SendData(_isPush, ms);
+                SendData(_uid, _isPush, ms);
             }
         }
     }
 
-    internal void BattleOver(BattleUnit _battleUnit, PlayerUnit _mPlayer, PlayerUnit _oPlayer)
+    internal void BattleOver(BattleUnit _battleUnit, int _mPlayer, int _oPlayer)
     {
-        battleDic.Remove(_mPlayer);
+        if (_mPlayer != -1)
+        {
+            battleDic.Remove(_mPlayer);
+        }
 
-        if (_oPlayer != null)
+        if (_oPlayer != -1)
         {
             battleDic.Remove(_oPlayer);
         }
@@ -271,15 +251,22 @@ internal class BattleManager
         }
     }
 
+    public void SendData(int _uid, bool _isPush, MemoryStream _ms)
+    {
+        PlayerUnitManager.Instance.SendData(_uid, _isPush, _ms);
+    }
+
+    private Dictionary<int, BattleUnit> tmpDic = new Dictionary<int, BattleUnit>();
+
     internal void Update(long _tick)
     {
         tick = _tick;
 
-        IEnumerator<KeyValuePair<PlayerUnit, BattleUnit>> enumerator = battleDic.GetEnumerator();
+        IEnumerator<KeyValuePair<int, BattleUnit>> enumerator = battleDic.GetEnumerator();
 
         while (enumerator.MoveNext())
         {
-            KeyValuePair<PlayerUnit, BattleUnit> pair = enumerator.Current;
+            KeyValuePair<int, BattleUnit> pair = enumerator.Current;
 
             if (pair.Value.CheckDoAutoAction(pair.Key))
             {
@@ -293,7 +280,7 @@ internal class BattleManager
 
             while (enumerator.MoveNext())
             {
-                KeyValuePair<PlayerUnit, BattleUnit> pair = enumerator.Current;
+                KeyValuePair<int, BattleUnit> pair = enumerator.Current;
 
                 pair.Value.DoAutoAction(pair.Key);
             }

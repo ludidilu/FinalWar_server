@@ -19,6 +19,10 @@ namespace FinalWar_server
 
             ResourceLoad();
 
+            PlayerUnitManager.Instance = new PlayerUnitManager();
+
+            BattleManager.Instance = new BattleManager();
+
             Server<PlayerUnit> server = new Server<PlayerUnit>();
 
             server.Start("0.0.0.0", ConfigDictionary.Instance.port, 100, 12000);
