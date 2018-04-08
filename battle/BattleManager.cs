@@ -143,7 +143,7 @@ internal class BattleManager
 
                     battleSDS = StaticData.GetData<BattleSDS>(PVP_BATTLE_ID);
 
-                    battleUnit.Init(_playerUnit, tmpPlayer, battleSDS.mCards, battleSDS.oCards, battleSDS.mapID, battleSDS.maxRoundNum, false);
+                    battleUnit.Init(_playerUnit, tmpPlayer, battleSDS.mCards, battleSDS.oCards, battleSDS.mapID, battleSDS.maxRoundNum, battleSDS.deckCardsNum, battleSDS.addCardsNum, false);
 
                     ReplyClient(_playerUnit, false, PlayerState.BATTLE);
 
@@ -167,7 +167,7 @@ internal class BattleManager
 
                 battleSDS = StaticData.GetData<BattleSDS>(battleID);
 
-                battleUnit.Init(_playerUnit, -1, battleSDS.mCards, battleSDS.oCards, battleSDS.mapID, battleSDS.maxRoundNum, true);
+                battleUnit.Init(_playerUnit, -1, battleSDS.mCards, battleSDS.oCards, battleSDS.mapID, battleSDS.maxRoundNum, battleSDS.deckCardsNum, battleSDS.addCardsNum, true);
 
                 ReplyClient(_playerUnit, false, PlayerState.BATTLE);
 
