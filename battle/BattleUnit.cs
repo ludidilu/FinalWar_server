@@ -1,10 +1,9 @@
 ﻿using FinalWar;
 using System.IO;
-using System.Collections.Generic;
 
 internal class BattleUnit
 {
-    private const long MAX_TICK = 1200;
+    private const long MAX_TICK = 1200000;
 
     private int mPlayer;
     private int oPlayer;
