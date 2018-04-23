@@ -63,6 +63,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\FinalWar_lib\bin\x64\Debug\FinalWar_lib.dll</HintPath>
     </Reference>
+    <Reference Include="FinalWar_proto">
+      <HintPath>..\FinalWar_proto\bin\x64\Debug\FinalWar_proto.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Protobuf">
+      <HintPath>..\FinalWar_proto\bin\x64\Debug\Google.Protobuf.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
