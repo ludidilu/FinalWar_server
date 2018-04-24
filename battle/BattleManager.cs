@@ -1,22 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using FinalWar_proto;
+using Google.Protobuf;
 
 internal class BattleManager
 {
-    enum PlayerState
-    {
-        FREE,
-        SEARCHING,
-        BATTLE
-    }
-
-    internal enum PackageData
-    {
-        PVP,
-        PVE,
-        CANCEL_SEARCH
-    }
-
     public static BattleManager Instance;
 
     private const int PVP_BATTLE_ID = 2;
@@ -35,21 +23,21 @@ internal class BattleManager
 
     internal void Login(int _playerUnit)
     {
-        PlayerState playerState;
+        PlayerStateEnum playerState;
 
         if (lastPlayer == _playerUnit)
         {
-            playerState = PlayerState.SEARCHING;
+            playerState = PlayerStateEnum.Searching;
         }
         else
         {
             if (battleDic.ContainsKey(_playerUnit))
             {
-                playerState = PlayerState.BATTLE;
+                playerState = PlayerStateEnum.Battle;
             }
             else
             {
-                playerState = PlayerState.FREE;
+                playerState = PlayerStateEnum.Free;
             }
         }
 
@@ -70,64 +58,69 @@ internal class BattleManager
         {
             using (BinaryReader br = new BinaryReader(ms))
             {
-                bool isBattle = br.ReadBoolean();
+                CsPackageTag tag = (CsPackageTag)br.ReadInt32();
 
-                if (isBattle)
+                switch (tag)
                 {
-                    BattleUnit battleUnit;
+                    case CsPackageTag.BattleData:
 
-                    if (battleDic.TryGetValue(_playerUnit, out battleUnit))
-                    {
-                        battleUnit.ReceiveData(_playerUnit, br);
-                    }
-                    else
-                    {
-                        if (_playerUnit == lastPlayer)
+                        BattleUnit battleUnit;
+
+                        if (battleDic.TryGetValue(_playerUnit, out battleUnit))
                         {
-                            ReplyClient(_playerUnit, false, PlayerState.SEARCHING);
+                            battleUnit.ReceiveData(_playerUnit, br);
                         }
                         else
                         {
-                            ReplyClient(_playerUnit, false, PlayerState.FREE);
+                            if (_playerUnit == lastPlayer)
+                            {
+                                ReplyClient(_playerUnit, false, PlayerStateEnum.Searching);
+                            }
+                            else
+                            {
+                                ReplyClient(_playerUnit, false, PlayerStateEnum.Free);
+                            }
                         }
-                    }
-                }
-                else
-                {
-                    if (battleDic.ContainsKey(_playerUnit))
-                    {
-                        ReplyClient(_playerUnit, false, PlayerState.BATTLE);
-                    }
-                    else
-                    {
-                        ReceiveActionData(_playerUnit, br);
-                    }
+
+                        break;
+
+                    case CsPackageTag.BattleManagerAction:
+
+                        if (battleDic.ContainsKey(_playerUnit))
+                        {
+                            ReplyClient(_playerUnit, false, PlayerStateEnum.Battle);
+                        }
+                        else
+                        {
+                            BattleManagerActionMessage message = BattleManagerActionMessage.Parser.ParseFrom(ms);
+
+                            ReceiveActionData(_playerUnit, message);
+                        }
+                        break;
                 }
             }
         }
     }
 
-    private void ReceiveActionData(int _playerUnit, BinaryReader _br)
+    private void ReceiveActionData(int _playerUnit, BattleManagerActionMessage _message)
     {
-        PackageData data = (PackageData)_br.ReadInt16();
-
         BattleUnit battleUnit;
 
         BattleSDS battleSDS;
 
-        switch (data)
+        switch (_message.BattleManagerAction)
         {
-            case PackageData.PVP:
+            case BattleManagerActionEnum.Pvp:
 
                 if (lastPlayer == -1)
                 {
                     lastPlayer = _playerUnit;
 
-                    ReplyClient(_playerUnit, false, PlayerState.SEARCHING);
+                    ReplyClient(_playerUnit, false, PlayerStateEnum.Searching);
                 }
                 else if (lastPlayer == _playerUnit)
                 {
-                    ReplyClient(_playerUnit, false, PlayerState.SEARCHING);
+                    ReplyClient(_playerUnit, false, PlayerStateEnum.Searching);
                 }
                 else
                 {
@@ -145,21 +138,21 @@ internal class BattleManager
 
                     battleUnit.Init(_playerUnit, tmpPlayer, battleSDS.mCards, battleSDS.oCards, battleSDS.mapID, battleSDS.maxRoundNum, battleSDS.deckCardsNum, battleSDS.addCardsNum, battleSDS.addMoney, battleSDS.defaultHandCardsNum, battleSDS.defaultMoney, false);
 
-                    ReplyClient(_playerUnit, false, PlayerState.BATTLE);
+                    ReplyClient(_playerUnit, false, PlayerStateEnum.Battle);
 
-                    ReplyClient(tmpPlayer, true, PlayerState.BATTLE);
+                    ReplyClient(tmpPlayer, true, PlayerStateEnum.Battle);
                 }
 
                 break;
 
-            case PackageData.PVE:
+            case BattleManagerActionEnum.Pve:
 
                 if (lastPlayer == _playerUnit)
                 {
                     lastPlayer = -1;
                 }
 
-                int battleID = _br.ReadInt32();
+                int battleID = _message.BattleId;
 
                 battleUnit = GetBattleUnit(processBattle);
 
@@ -169,24 +162,24 @@ internal class BattleManager
 
                 battleUnit.Init(_playerUnit, -1, battleSDS.mCards, battleSDS.oCards, battleSDS.mapID, battleSDS.maxRoundNum, battleSDS.deckCardsNum, battleSDS.addCardsNum, battleSDS.addMoney, battleSDS.defaultHandCardsNum, battleSDS.defaultMoney, true);
 
-                ReplyClient(_playerUnit, false, PlayerState.BATTLE);
+                ReplyClient(_playerUnit, false, PlayerStateEnum.Battle);
 
                 break;
 
-            case PackageData.CANCEL_SEARCH:
+            case BattleManagerActionEnum.CancelSearching:
 
                 if (lastPlayer == _playerUnit)
                 {
                     lastPlayer = -1;
                 }
 
-                ReplyClient(_playerUnit, false, PlayerState.FREE);
+                ReplyClient(_playerUnit, false, PlayerStateEnum.Free);
 
                 break;
         }
     }
 
-    private void ReplyClient(int _uid, bool _isPush, PlayerState _playerState)
+    private void ReplyClient(int _uid, bool _isPush, PlayerStateEnum _playerState)
     {
         using (MemoryStream ms = new MemoryStream())
         {
@@ -194,10 +187,14 @@ internal class BattleManager
             {
                 if (_isPush)
                 {
-                    bw.Write(false);
+                    bw.Write((int)ScPackageTag.PlayerState);
                 }
 
-                bw.Write((short)_playerState);
+                PlayerStateMessage message = new PlayerStateMessage();
+
+                message.PlayerState = _playerState;
+
+                bw.Write(message.ToByteArray());
 
                 SendData(_uid, _isPush, ms);
             }

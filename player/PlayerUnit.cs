@@ -1,6 +1,7 @@
 ﻿using Connection;
 using System.IO;
 using System;
+using FinalWar_proto;
 
 internal class PlayerUnit : UnitBase
 {
@@ -39,15 +40,26 @@ internal class PlayerUnit : UnitBase
                 {
                     try
                     {
-                        uid = br.ReadInt32();
+                        CsPackageTag tag = (CsPackageTag)br.ReadInt32();
 
-                        PlayerUnitManager.Instance.Login(uid, this);
+                        if (tag != CsPackageTag.Login)
+                        {
 
-                        BattleManager.Instance.Login(uid);
+                        }
+                        else
+                        {
+                            LoginMessage message = LoginMessage.Parser.ParseFrom(ms);
+
+                            uid = int.Parse(message.Name);
+
+                            PlayerUnitManager.Instance.Login(uid, this);
+
+                            BattleManager.Instance.Login(uid);
+                        }
                     }
                     catch (Exception e)
                     {
-
+                        Log.Write(e.ToString());
                     }
                 }
             }

@@ -1,5 +1,6 @@
 ﻿using FinalWar;
 using System.IO;
+using FinalWar_proto;
 
 internal class BattleUnit
 {
@@ -65,7 +66,7 @@ internal class BattleUnit
             {
                 if (_isPush)
                 {
-                    bw.Write(true);
+                    bw.Write((int)ScPackageTag.BattleData);
                 }
 
                 bw.Write(_ms.GetBuffer(), 0, (int)_ms.Length);
