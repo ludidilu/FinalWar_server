@@ -7,23 +7,16 @@ internal class PlayerUnit : UnitBase
 {
     private int uid = -1;
 
-    public void Logout()
-    {
-        uid = -1;
-    }
-
     public override void Kick()
     {
-        base.Kick();
-
         if (uid != -1)
         {
-            PlayerUnitManager.Instance.Logout(uid);
-
             BattleManager.Instance.Logout(uid);
 
-            Logout();
+            uid = -1;
         }
+
+        base.Kick();
     }
 
     public override void ReceiveData(byte[] _bytes)
@@ -42,11 +35,7 @@ internal class PlayerUnit : UnitBase
                     {
                         CsPackageTag tag = (CsPackageTag)br.ReadInt32();
 
-                        if (tag != CsPackageTag.Login)
-                        {
-
-                        }
-                        else
+                        if (tag == CsPackageTag.Login)
                         {
                             LoginMessage message = LoginMessage.Parser.ParseFrom(ms);
 

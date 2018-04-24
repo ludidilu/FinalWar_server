@@ -13,7 +13,7 @@ class PlayerUnitManager
 
         if (dic.TryGetValue(_uid, out unit))
         {
-            unit.Logout();
+            unit.Kick();
 
             dic[_uid] = _unit;
         }
