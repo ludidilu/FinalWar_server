@@ -85,11 +85,13 @@
     <Compile Include="config\ConfigDictionary.cs" />
     <Compile Include="csv\CsvBase.cs" />
     <Compile Include="csv\sds\AuraSDS.cs" />
+    <Compile Include="csv\sds\BattleInitDataSDS.cs" />
     <Compile Include="csv\sds\EffectSDS.cs" />
     <Compile Include="csv\sds\HeroSDS.cs" />
     <Compile Include="csv\sds\HeroTypeSDS.cs" />
     <Compile Include="csv\sds\MapSDS.cs" />
     <Compile Include="csv\sds\BattleSDS.cs" />
+    <Compile Include="csv\sds\PlayerInitDataSDS.cs" />
     <Compile Include="csv\StaticData.cs" />
     <Compile Include="player\PlayerUnit.cs" />
     <Compile Include="player\PlayerUnitManager.cs" />
