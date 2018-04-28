@@ -19,8 +19,6 @@ public class MapSDS : CsvBase, IMapSDS
 
     private KeyValuePair<int, int>[] heroReal;
 
-    private KeyValuePair<int, int>[] fearActionReal;
-
     public MapData GetMapData()
     {
         return mapData;
@@ -29,11 +27,6 @@ public class MapSDS : CsvBase, IMapSDS
     public KeyValuePair<int, int>[] GetHero()
     {
         return heroReal;
-    }
-
-    public KeyValuePair<int, int>[] GetFearAction()
-    {
-        return fearActionReal;
     }
 
     public override void Fix()
@@ -46,15 +39,6 @@ public class MapSDS : CsvBase, IMapSDS
 
             heroReal[i] = new KeyValuePair<int, int>(int.Parse(strArr[0]), int.Parse(strArr[1]));
         }
-
-        fearActionReal = new KeyValuePair<int, int>[fearAction.Length];
-
-        for (int i = 0; i < fearAction.Length; i++)
-        {
-            string[] strArr = fearAction[i].Split('&');
-
-            fearActionReal[i] = new KeyValuePair<int, int>(int.Parse(strArr[0]), int.Parse(strArr[1]));
-        }
     }
 
     public static void Load(Action _callBack)
@@ -63,7 +47,7 @@ public class MapSDS : CsvBase, IMapSDS
 
         Dictionary<int, MapSDS> dic = StaticData.GetDic<MapSDS>();
 
-        Dictionary<int, MapSDS>.ValueCollection.Enumerator enumerator = dic.Values.GetEnumerator();
+        IEnumerator<MapSDS> enumerator = dic.Values.GetEnumerator();
 
 #if USE_ASSETBUNDLE
 
